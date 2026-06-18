@@ -351,6 +351,78 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |
 |**Postcondiciones**| El sistema presenta la grilla de turnos (vista diaria, semanal o mensual) con capacidades de filtrado opcional (por paciente, estado del turno). Operación de lectura con habilitación de acciones de gestión directa.  |
 
+|**UC–REC-07**|**Configurar Parámetros de Agenda**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA  |
+|**Descripción**| El Administrador define los parámetros generales de la agenda del laboratorio, incluyendo los días y horarios hábiles de atención, la duración estándar de los turnos, la cantidad máxima de turnos por franja horaria y los períodos de receso o inhábiles.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
+|**Postcondiciones**| Los parámetros de configuración quedan almacenados en el sistema y son aplicados para el cálculo de disponibilidad horaria del Agente IA.  |
+
+|**UC–REC-08**|**Bloquear/Desbloquear Días y Franjas Horarias**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| El Administrador bloquea o desbloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
+|**Postcondiciones**| Los días o franjas seleccionados quedan marcados como NO DISPONIBLES en la agenda. El Agente IA no ofrecerá esos horarios al momento de agendar.  |
+
+|**UC–REC-09**|**Gestionar Turno Manualmente desde Web Interna**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| El personal autorizado (Bioquímico/Doctor o Administrador) agenda, cancela o reprograma un turno a nombre de un paciente directamente desde la interfaz web interna, sin intervención del Agente IA.  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |
+|**Postcondiciones**| El turno queda registrado, modificado o cancelado en el sistema según la acción realizada. Se envían las notificaciones correspondientes al paciente.  |
+
+|**UC–REC-10**|**Crear Indicación Médica**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas  |
+|**Descripción**| El Bioquímico/Doctor o Administrador crea una nueva indicación médica predefinida en el sistema para ser enviada automáticamente al paciente al momento de agendar un turno.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |
+|**Postcondiciones**| La nueva indicación médica queda registrada en el sistema y disponible para ser asignada a futuros turnos.  |
+
+|**UC–REC-11**|**Modificar Indicación Médica**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas  |
+|**Descripción**| El Bioquímico/Doctor o Administrador modifica el contenido de una indicación médica predefinida existente en el sistema.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. Debe existir al menos una indicación médica registrada.  |
+|**Postcondiciones**| La indicación médica queda actualizada con el nuevo contenido en la base de datos.  |
+
+|**UC–REC-12**|**Eliminar Indicación Médica**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas  |
+|**Descripción**| El Bioquímico/Doctor o Administrador elimina lógicamente una indicación médica predefinida del sistema, desactivándola para que no sea enviada en futuros turnos.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. Debe existir al menos una indicación médica registrada.  |
+|**Postcondiciones**| La indicación médica queda marcada como INACTIVA en la base de datos.  |
+
+|**UC–REC-13**|**Consultar Indicaciones Médicas**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas  |
+|**Descripción**| El Bioquímico/Doctor o Administrador visualiza el listado completo de indicaciones médicas predefinidas registradas en el sistema, con su contenido y estado actual.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |
+|**Postcondiciones**| El sistema presenta el listado paginado de indicaciones médicas. Operación de solo lectura.  |
+
+|**UC–REC-14**|**Cancelar Turno por Vencimiento**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| Proceso automático del sistema que se ejecuta diariamente al cierre del horario de atención. Identifica todos los turnos cuyo horario ya transcurrió, que no fueron atendidos ni cancelados, y los marca como "No Asistió", liberando los recursos asociados.  |
+|**Precondición**| Debe existir al menos un turno con fecha/hora vencida en estado "Confirmado" o "Pendiente".  |
+|**Postcondiciones**| El estado del turno cambia a "No Asistió". El bloque horario queda liberado en la agenda. Se dispara UC-REC-04 para reasignar el espacio liberado.  |
+
+|**UC–REC-15**|**Registrar Asistencia a Turno**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| El Bioquímico/Doctor o Administrador registra la asistencia o inasistencia del paciente a su turno programado al momento de presentarse en el laboratorio.  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. El paciente debe tener un turno en estado "Confirmado" para el día y hora actual.  |
+|**Postcondiciones**| Si asiste: el estado del turno cambia a "Atendido" y se habilita el flujo para iniciar la consulta. Si no asiste: el estado del turno cambia a "No Asistió", el bloque horario se libera y se dispara UC-REC-04.  |
+
 #### 2.7.3.2 Subsistema Laboratorio Bíoquímico
 |**UC–DIAG-01**|**Registrar Ficha Clínica**|
 |---|---|
@@ -618,6 +690,223 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | - | - |
 |**Rendimiento**|**Paso**|  |
 |  | 6 | Menos de 2 segundos |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-07**|**Configurar Parámetros de Agenda**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA |  |
+|**Descripción**| El Administrador define los parámetros generales de la agenda del laboratorio, incluyendo los días y horarios hábiles de atención, la duración estándar de los turnos, la cantidad máxima de turnos por franja horaria y los períodos de receso o inhábiles. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Gestión de Agenda y selecciona "Configuración". |
+|  | 2 | La interfaz despliega el formulario de configuración con los valores actuales. |
+|  | 3 | El Administrador define los días hábiles (ej. lunes a viernes) y horarios de atención (ej. 08:00 a 12:00 y 14:00 a 18:00). |
+|  | 4 | El Administrador configura la duración estándar del turno (ej. 30 minutos) y el intervalo entre turnos. |
+|  | 5 | El Administrador define los períodos de receso o inhábiles (feriados fijos, receso académico). |
+|  | 6 | El Administrador presiona "Guardar Configuración". |
+|  | 7 | El sistema valida que los horarios y duraciones sean consistentes y persiste los cambios. |
+|  | 8 | El sistema registra el evento en la tabla de auditoría. |
+|  | 9 | La interfaz muestra un mensaje de "Configuración guardada exitosamente". |
+|**Postcondición**| Los parámetros de agenda quedan almacenados y aplicados al cálculo de disponibilidad del Agente IA. |  |
+|**Excepciones**|**Paso**|  |
+|  | 7 | Si los horarios ingresados son inconsistentes (ej. hora de fin menor a hora de inicio), el sistema muestra una alerta de validación y no persiste los cambios. |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-08**|**Bloquear/Desbloquear Días y Franjas Horarias**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| El Administrador bloquea o desbloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al calendario y selecciona la opción "Bloquear Día/Franja". |
+|  | 2 | La interfaz muestra el calendario mensual con los turnos existentes. |
+|  | 3 | El Administrador selecciona el día o rango de fechas a bloquear. |
+|  | 4 | El Administrador elige si bloquea el día completo o una franja horaria específica. |
+|  | 5 | El Administrador ingresa el motivo del bloqueo y presiona "Confirmar Bloqueo". |
+|  | 6 | El sistema valida que no existan turnos activos en el período seleccionado. |
+|  | 7 | El sistema marca los bloques como NO DISPONIBLES en la agenda. |
+|  | 8 | El sistema registra el evento en la tabla de auditoría. |
+|**Postcondición**| Los días o franjas seleccionados quedan marcados como NO DISPONIBLES. |  |
+|**Excepciones**|**Paso**|  |
+|  | 6 | Si existen turnos activos en el período, el sistema notifica al Administrador y ofrece opciones para cancelar o reprogramar los turnos afectados antes de aplicar el bloqueo. |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 2 segundos |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| El desbloqueo sigue el mismo flujo inverso, seleccionando días bloqueados y presionando "Desbloquear". |  |
+
+|**UCE–REC-09**|**Gestionar Turno Manualmente desde Web Interna**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| El personal autorizado (Bioquímico/Doctor o Administrador) agenda, cancela o reprograma un turno a nombre de un paciente directamente desde la interfaz web interna, sin intervención del Agente IA. |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. |  |
+|**Secuencia normal (Agendar)**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Gestión de Agenda y presiona "Nuevo Turno". |
+|  | 2 | El sistema solicita el DNI del paciente. |
+|  | 3 | El usuario ingresa el DNI; el sistema busca el registro del paciente. |
+|  | 4 | El sistema muestra la grilla de disponibilidad horaria. |
+|  | 5 | El usuario selecciona fecha, hora y tipo de análisis. |
+|  | 6 | El sistema registra y reserva el turno a nombre del paciente. |
+|  | 7 | El sistema confirma la operación y envía una notificación de confirmación al paciente vía WhatsApp. |
+|**Secuencia normal (Cancelar)**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Agenda y localiza el turno en el calendario. |
+|  | 2 | El usuario selecciona el turno y presiona "Cancelar Turno". |
+|  | 3 | El sistema solicita confirmación de la cancelación. |
+|  | 4 | El usuario confirma. |
+|  | 5 | El sistema cambia el estado del turno a "Cancelado", libera el bloque horario y notifica al paciente. |
+|  | 6 | Se dispara internamente UC-REC-04. |
+|**Postcondición**| El turno queda registrado, modificado o cancelado según la acción realizada. |  |
+|**Excepciones**|**Paso**|  |
+|  | 3 (Agendar) | Si el DNI no existe en el sistema, el formulario permite registrar los datos básicos del paciente en el momento. |
+|  | 3 (Cancelar) | Si el turno está a menos de 24 horas, el sistema advierte al usuario y solicita confirmación explícita. |
+|**Rendimiento**|**Paso**|  |
+|  | 6 (Agendar) | Menos de 1 segundo |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Gestiona pacientes que llaman por teléfono, adultos mayores sin WhatsApp o urgencias que no pueden usar el Agente IA. |  |
+
+|**UCE–REC-10**|**Crear Indicación Médica**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador crea una nueva indicación médica predefinida en el sistema para ser enviada automáticamente al paciente al momento de agendar un turno. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Indicaciones Médicas y presiona "Nueva Indicación". |
+|  | 2 | La interfaz despliega un formulario con los campos: Título, Contenido, Tipo de Análisis asociado (opcional). |
+|  | 3 | El usuario completa los campos y presiona "Guardar". |
+|  | 4 | El sistema valida que el contenido no esté vacío y persiste el registro. |
+|  | 5 | La interfaz muestra un mensaje de "Indicación creada exitosamente". |
+|**Postcondición**| La nueva indicación médica queda registrada y disponible para ser asignada a turnos futuros. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el contenido está vacío, el sistema muestra una alerta de validación y no persiste. |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 1 segundo |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-11**|**Modificar Indicación Médica**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador modifica el contenido de una indicación médica predefinida existente en el sistema. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. Debe existir al menos una indicación médica registrada. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Indicaciones Médicas y selecciona una del listado. |
+|  | 2 | La interfaz despliega el formulario prepoblado con los datos actuales. |
+|  | 3 | El usuario modifica los campos deseados y presiona "Guardar Cambios". |
+|  | 4 | El sistema valida los campos y actualiza el registro en la base de datos. |
+|  | 5 | La interfaz muestra un mensaje de "Indicación actualizada exitosamente". |
+|**Postcondición**| La indicación médica queda actualizada con el nuevo contenido. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el contenido queda vacío, el sistema rechaza la modificación y notifica al usuario. |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 1 segundo |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-12**|**Eliminar Indicación Médica**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador elimina lógicamente una indicación médica predefinida del sistema, desactivándola para que no sea enviada en futuros turnos. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. Debe existir al menos una indicación médica registrada. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Indicaciones Médicas y selecciona una del listado. |
+|  | 2 | El usuario presiona "Eliminar". |
+|  | 3 | El sistema solicita confirmación de la eliminación. |
+|  | 4 | El usuario confirma la acción. |
+|  | 5 | El sistema cambia el estado de la indicación a INACTIVA (baja lógica). |
+|  | 6 | La interfaz muestra un mensaje de "Indicación eliminada exitosamente". |
+|**Postcondición**| La indicación médica queda marcada como INACTIVA en la base de datos. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el usuario cancela la confirmación, el sistema aborta la operación sin modificar el registro. |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se realiza baja lógica para mantener la integridad referencial de turnos históricos que utilizaron esa indicación. |  |
+
+|**UCE–REC-13**|**Consultar Indicaciones Médicas**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-02 Envío de Indicaciones Médicas |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador visualiza el listado completo de indicaciones médicas predefinidas registradas en el sistema, con su contenido y estado actual. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Indicaciones Médicas. |
+|  | 2 | El sistema consulta la base de datos y recupera todas las indicaciones registradas. |
+|  | 3 | La interfaz renderiza una tabla paginada con Título, Contenido, Tipo de Análisis y Estado. |
+|  | 4 | El usuario aplica filtros opcionales (por estado: activa/inactiva, por tipo de análisis). |
+|**Postcondición**| El sistema presenta el listado de indicaciones médicas. Operación de solo lectura. |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no existen indicaciones registradas, la interfaz muestra el mensaje "No hay indicaciones médicas registradas" y habilita el botón para crear una nueva. |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 1 segundo |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-14**|**Cancelar Turno por Vencimiento**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| Proceso automático del sistema que se ejecuta diariamente al cierre del horario de atención. Identifica todos los turnos cuyo horario ya transcurrió, que no fueron atendidos ni cancelados, y los marca como "No Asistió", liberando los recursos asociados. |  |
+|**Precondición**| Debe existir al menos un turno con fecha/hora vencida en estado "Confirmado" o "Pendiente". |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El temporizador del sistema dispara la rutina diaria de depuración de agenda al cierre del horario de atención. |
+|  | 2 | El sistema consulta la base de datos y recupera los turnos cuya fecha/hora ya transcurrió y cuyo estado es "Confirmado" o "Pendiente". |
+|  | 3 | Para cada turno encontrado, el sistema cambia el estado a "No Asistió". |
+|  | 4 | El sistema libera el bloque horario en la agenda. |
+|  | 5 | El sistema registra cada cambio en la tabla de auditoría. |
+|  | 6 | Se dispara internamente UC-REC-04 por cada bloque liberado. |
+|**Postcondición**| Los turnos vencidos no atendidos cambian a "No Asistió" y los bloques quedan liberados. |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay turnos en esas condiciones, la rutina finaliza sin realizar cambios. |
+|**Rendimiento**|**Paso**|  |
+|  | 2-3 | Hasta 5 segundos dependiendo del volumen de turnos a procesar. |
+|**Frecuencia**| Diaria |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| La ejecución se programa como una tarea programada (job) del lado del servidor. |  |
+
+|**UCE–REC-15**|**Registrar Asistencia a Turno**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador registra la asistencia o inasistencia del paciente a su turno programado al momento de presentarse en el laboratorio. |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. El paciente debe tener un turno en estado "Confirmado" para el día y hora actual. |  |
+|**Secuencia normal (Presente)**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Gestión de Agenda y localiza el turno del día. |
+|  | 2 | El usuario selecciona el turno y presiona "Registrar Asistencia". |
+|  | 3 | El sistema despliega un diálogo con las opciones "Presente" y "Ausente". |
+|  | 4 | El usuario selecciona "Presente". |
+|  | 5 | El sistema cambia el estado del turno a "Atendido" y registra la hora de atención. |
+|  | 6 | El sistema registra el evento en la tabla de auditoría. |
+|  | 7 | La interfaz confirma la operación y habilita el botón para iniciar la consulta (UC-DIAG-01). |
+|**Secuencia normal (Ausente)**|**Paso**|  |
+|  | 1 | El usuario sigue los pasos 1 a 3 de la secuencia normal (Presente). |
+|  | 2 | El usuario selecciona "Ausente". |
+|  | 3 | El sistema solicita un motivo opcional de inasistencia. |
+|  | 4 | El usuario ingresa el motivo (opcional) y confirma. |
+|  | 5 | El sistema cambia el estado del turno a "No Asistió" y libera el bloque horario. |
+|  | 6 | Se dispara internamente UC-REC-04. |
+|  | 7 | El sistema registra el evento en la tabla de auditoría. |
+|**Postcondición**| El estado del turno se actualiza a "Atendido" o "No Asistió" según corresponda. |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si el turno ya fue marcado previamente, el sistema informa y bloquea la acción. |
+|**Rendimiento**|**Paso**|  |
+|  | 5 (Presente) | Menos de 1 segundo |
 |**Frecuencia**| Alta |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
