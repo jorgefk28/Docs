@@ -1,0 +1,8 @@
+{
+  "engines": {
+    "node": "22.14.0"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "1.16.2"
+  }
+}

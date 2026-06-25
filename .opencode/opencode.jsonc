@@ -1,0 +1,87 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "openrouter": {
+      "models": {
+        "deepseek-v4-flash": {
+          "id": "deepseek/deepseek-v4-flash",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.7 }
+          }
+        },
+        "deepseek-v3.2": {
+          "id": "deepseek/deepseek-v3.2",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.7 }
+          }
+        },
+        "claude-haiku-4-5": {
+          "id": "anthropic/claude-haiku-4-5",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.6 }
+          }
+        },
+        "qwen3.6-flash": {
+          "id": "qwen/qwen3.6-flash",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.7 }
+          }
+        },
+        "deepseek-v4-pro": {
+          "id": "deepseek/deepseek-v4-pro",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.6 }
+          }
+        },
+        "qwen3.6-plus": {
+          "id": "qwen/qwen3.6-plus",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.7 }
+          }
+        }
+      }
+    },
+    "minimax": {
+      "models": {
+        "MiniMax-M2.7": {
+          "id": "minimax/MiniMax-M2.7",
+          "variants": {
+            "conservative": { "temperature": 0.2 },
+            "creative": { "temperature": 0.6 }
+          }
+        }
+      }
+    },
+    "openai": {
+      "models": {
+        "gpt-5.2": {
+          "id": "openai/gpt-5.2",
+          "variants": {
+            "conservative": { "temperature": 0.4, "reasoningEffort": "medium" },
+            "creative": { "temperature": 0.6, "reasoningEffort": "medium" }
+          }
+        },
+        "gpt-5.4-mini": {
+          "id": "openai/gpt-5.4-mini",
+          "variants": {
+            "conservative": { "temperature": 0.2, "reasoningEffort": "medium" },
+            "creative": { "temperature": 0.6, "reasoningEffort": "medium" }
+          }
+        },
+        "gpt-5.4-nano": {
+          "id": "openai/gpt-5.4-nano",
+          "variants": {
+            "conservative": { "temperature": 0.2, "reasoningEffort": "medium" },
+            "creative": { "temperature": 0.6, "reasoningEffort": "medium" }
+          }
+        }
+      }
+    }
+  }
+}
