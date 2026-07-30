@@ -1,7 +1,7 @@
 ---
 description: Adversarial Requirements Reviewer — finds ambiguities, inconsistencies, gaps, and architecture violations in specification documents
 mode: subagent
-model: openrouter/deepseek-v4-flash
+model: openrouter/deepseek-v4-pro
 variant: creative
 permission:
   read: allow

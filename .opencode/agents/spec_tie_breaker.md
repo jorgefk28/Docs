@@ -5,7 +5,7 @@ model: openrouter/deepseek-v4-pro
 variant: conservative
 permission:
   read: allow
-  edit: allow
+  edit: deny
   grep: allow
   glob: allow
   bash:

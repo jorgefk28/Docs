@@ -1,16 +1,21 @@
 ---
 description: Seasoned software analyst and team leader — orchestrates, never codes
 mode: all
-model: openrouter/deepseek-v4-flash
+model: openrouter/deepseek-v4-pro
 variant: conservative
 permission:
   skill: 
     "*": allow
+    "supabase": allow
+    "supabase-postgres-best-practices": allow
+    "writing-tests": allow
   read: allow
   edit:
     "*": deny
   grep: allow
   glob: allow
+  todoread: allow
+  todowrite: allow
   task:
     "*": deny
     deep_diver: allow
@@ -30,7 +35,7 @@ permission:
     "git diff *": allow
     "git log": allow
     "git log *": allow
-    writeArtifact: allow
+  writeArtifact: allow
 ---
 
 # ROLE

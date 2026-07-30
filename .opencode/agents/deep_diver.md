@@ -24,6 +24,8 @@ permission:
     "git diff *": allow
     "git log": allow
     "git log *": allow
+    "pnpm run knip": allow
+    "pnpm run knip *": allow
     writeArtifact: allow
 ---
 

@@ -1,8 +1,8 @@
 ---
 description: Requirements Advocate — defends specification design decisions against adversarial attacks
 mode: subagent
-model: openrouter/qwen3.6-plus
-variant: conservative
+model: openrouter/deepseek-v4-flash
+variant: creative
 permission:
   read: allow
   edit: deny
