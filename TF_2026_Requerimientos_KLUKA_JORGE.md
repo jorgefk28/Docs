@@ -431,7 +431,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El personal autorizado modifica los datos demográficos de un paciente existente en el sistema. |
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. |
 |**Postcondiciones**| Los datos del paciente quedan actualizados en la base de datos. |
-|**Comentarios**| Incluye `<<include>>` Buscar Paciente. |
+|**Comentarios**| Incluye `<<include>>` UC-REC-S-01 (Buscar Paciente). |
 
 |**UC–REC-18**|**Consultar Paciente**|
 |---|---|
@@ -448,7 +448,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El Administrador desactiva (baja lógica) el registro de un paciente, impidiendo nuevos turnos o análisis pero manteniendo la integridad histórica de los registros. |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. |
 |**Postcondiciones**| El paciente queda marcado como "Inactivo" en la base de datos. No puede agendarse nuevos turnos a su nombre. Los registros históricos se conservan. |
-|**Comentarios**| Incluye `<<include>>` Buscar Paciente. Se realiza baja lógica para mantener integridad referencial. |
+|**Comentarios**| Incluye `<<include>>` UC-REC-S-01 (Buscar Paciente). Se realiza baja lógica para mantener integridad referencial. |
 
 |**UC–REC-20**|**Agendar Turno Manualmente**|
 |---|---|
@@ -474,6 +474,15 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El personal autorizado cambia la fecha y/o hora de un turno existente desde la interfaz web interna. |
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. El turno debe existir y estar en estado vigente. Debe haber disponibilidad en la agenda. |
 |**Postcondiciones**| El turno se actualiza con la nueva fecha/hora. El bloque anterior queda liberado. Se notifica al paciente. Incluye UC-REC-04 (Reasignación Automática). |
+
+|**UC–REC-S-01**|**Buscar Paciente**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-05 Registro de Ficha Clínica |
+|**Descripción**| Subproceso reutilizable de búsqueda de pacientes. Recibe un criterio de búsqueda (DNI, Nombre o Apellido) y retorna el/los paciente(s) coincidente(s) al caso de uso invocante. |
+|**Precondición**| El caso de uso invocante debe proveer al menos un criterio de búsqueda. |
+|**Postcondiciones**| Los datos del paciente seleccionado son retornados al caso de uso invocante para continuar su flujo. |
+|**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo ni produce valor por sí mismo. Solo existe como subflujo `<<include>>` de UC-REC-17 y UC-REC-19. |
 
 #### 2.7.3.2 Subsistema Laboratorio Bíoquímico
 |**UC–DIAG-01**|**Registrar Ficha Clínica**|
@@ -969,7 +978,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con rol Bioquímico/Doctor o Administrador. |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El usuario ingresa al módulo de "Pacientes" y presiona "Buscar Paciente". |
-|  | 2 | El sistema ejecuta Buscar Paciente: solicita DNI, Nombre o Apellido como criterio de búsqueda. |
+|  | 2 | El sistema ejecuta UCE-REC-S-01 (Buscar Paciente): solicita DNI, Nombre o Apellido como criterio de búsqueda. |
 |  | 3 | El usuario ingresa el criterio de búsqueda. |
 |  | 4 | El sistema consulta la base de datos. |
 |  | 5 | Si hay múltiples coincidencias, muestra un listado paginado para que el usuario seleccione. Si hay una sola coincidencia, la selecciona automáticamente. |
@@ -1023,7 +1032,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El usuario ingresa al módulo de "Pacientes" y presiona "Buscar Paciente". |
-|  | 2 | El sistema ejecuta Buscar Paciente: solicita DNI, Nombre o Apellido. |
+|  | 2 | El sistema ejecuta UCE-REC-S-01 (Buscar Paciente): solicita DNI, Nombre o Apellido. |
 |  | 3 | El usuario ingresa el criterio de búsqueda. |
 |  | 4 | El sistema recupera y muestra los datos del paciente. |
 |  | 5 | El usuario presiona "Desactivar Paciente". |
@@ -1131,6 +1140,28 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| Reemplaza la funcionalidad de "Reprogramar" del antiguo UC-REC-09. |  |
+
+|**UCE–REC-S-01**|**Buscar Paciente**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico |  |
+|**Requisitos asociados**| RF-05 Registro de Ficha Clínica |  |
+|**Descripción**| Subproceso reutilizable de búsqueda de pacientes. Recibe un criterio de búsqueda (DNI, Nombre, Apellido) y retorna el/los pacientes coincidentes al caso de uso invocante. |  |
+|**Precondición**| El caso de uso invocante debe proveer al menos un criterio de búsqueda. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El sistema solicita al usuario el criterio de búsqueda (DNI, Nombre o Apellido). |
+|  | 2 | El usuario ingresa el criterio de búsqueda. |
+|  | 3 | El sistema consulta la base de datos con el criterio ingresado. |
+|  | 4a | Si hay una sola coincidencia exacta: el sistema retorna los datos del paciente al caso de uso invocante. |
+|  | 4b | Si hay múltiples coincidencias: el sistema muestra un listado paginado para que el usuario seleccione. Al seleccionar, retorna los datos. |
+|**Postcondición**| Los datos del paciente seleccionado son retornados al caso de uso invocante. |  |
+|**Excepciones**|**Paso**|  |
+|  | 3 | Si ningún paciente coincide con el criterio ingresado, el sistema informa "Paciente no encontrado" al caso de uso invocante para que maneje la situación (ofrecer crear uno nuevo, buscar de nuevo, etc.). |
+|  | 3 | Si ocurre un error de conexión con la base de datos, se retorna un error al caso de uso invocante. |
+|**Rendimiento**|**Paso**|  |
+|  | 3 | Menos de 1 segundo |
+|**Frecuencia**| Alta (invocado por Modificar y Desactivar Paciente) |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo ni produce valor por sí mismo. Solo existe como subflujo `<<include>>` de UC-REC-17 y UC-REC-19. La búsqueda es flexible: DNI (coincidencia exacta), Nombre o Apellido (coincidencia parcial). |  |
 
 ### 2.8.2 Subsistema Recursos de Laboratorio
 |**UCE–DIAG-01**|**Registrar Ficha Clínica**|  |
