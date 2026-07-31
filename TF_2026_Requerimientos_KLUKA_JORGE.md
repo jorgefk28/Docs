@@ -68,13 +68,13 @@ En este sentido, la necesidad de un sistema para el laboratorio es crítica, no 
 El sistema se estructura en componentes lógicos independientes que dividen la funcionalidad en áreas clave: Gestión de Pacientes, Laboratorio Bioquímico, Recursos de Laboratorio y Seguridad.
 ### 2.2.2 Descripción de Subsistemas
 # Subsistema de Gestión de Pacientes
-El Subsistema de Recepción y Administración de Pacientes es el componente encargado de la logística de ingreso y el contacto inicial con los Pacientes. Su función principal es organizar el flujo de atención administrativa, comenzando por la agenda y asignación de turnos, hasta la gestión del repositorio centralizado a largo plazo, el cual resguarda el historial clínico acumulado de las personas atendidas. Este subsistema abarca los módulos de**Gestión de Turnos y Atención**, y**Gestión de Pacientes**.
+El Subsistema de Gestión de Pacientes es el componente encargado de la logística de ingreso y el contacto inicial con los Pacientes. Su función principal es organizar el flujo de atención administrativa, comenzando por la agenda y asignación de turnos, hasta la gestión del repositorio centralizado a largo plazo, el cual resguarda el historial clínico acumulado de las personas atendidas. Este subsistema abarca los módulos de**Gestión de Turnos y Atención**, y**Gestión de Pacientes**.
 # Subsistema de Laboratorio Bioquímico
-El Subsistema de Diagnóstico y Laboratorio Bioquímico es el núcleo clínico y científico destinado al procesamiento de las muestras y la evaluación médica. Su propósito fundamental es sistematizar la recolección de los datos en la ficha clínica al momento de la consulta, trazar el ciclo de vida completo de los estudios microbiológicos (abarcando los estados pendiente, en proceso, terminado y validado) y automatizar la entrega remota y segura de los diagnósticos finales a los pacientes. Este subsistema abarca los módulos de**Registro deInformación Clínica**,**Registro de Análisis**, y**Emisión de Resultados**.
+El Subsistema de Laboratorio Bioquímico es el núcleo clínico y científico destinado al procesamiento de las muestras y la evaluación médica. Su propósito fundamental es sistematizar la recolección de los datos en la ficha clínica al momento de la consulta, trazar el ciclo de vida completo de los estudios microbiológicos (abarcando los estados pendiente, en proceso, terminado y validado) y automatizar la entrega remota y segura de los diagnósticos finales a los pacientes. Este subsistema abarca los módulos de**Registro de Información Clínica**,**Registro de Análisis**, y**Emisión de Resultados**.
 # Subsistema de Recursos de Laboratorio
 El Subsistema de Recursos de Laboratorio es el componente encargado de administrar los bienes físicos y químicos del módulo de micología. Este subsistema digitaliza y controla la trazabilidad del inventario, gestionando el ingreso y egreso de los insumos reactivos utilizados por profesores y alumnos en las prácticas. A su vez, sistematiza el registro exacto del volumen y peso de los residuos químicos generados para cumplir con las normativas vigentes. Este subsistema abarca los módulos de**Stock de Insumos Reactivos**y**Control de Residuos**.
 # Subsistema de Acceso y Seguridad
-El Subsistema de Acceso y Seguridades es el componente transversal encargado de proteger la confidencialidad de los datos y garantizar la transparencia operativa de la aplicación. Su función es gestionar la autenticación y autorización de los usuarios mediante un esquema de roles y permisos, al mismo tiempo que mantiene un registro detallado, cronológico e inmutable de todas las acciones críticas realizadas en la plataforma. Este subsistema abarca los módulos de**Usuarios**,**Roles y Permisos**, y**Auditoría**.
+El Subsistema de Acceso y Seguridad es el componente transversal encargado de proteger la confidencialidad de los datos y garantizar la transparencia operativa de la aplicación. Su función es gestionar la autenticación y autorización de los usuarios mediante un esquema de roles y permisos, al mismo tiempo que mantiene un registro detallado, cronológico e inmutable de todas las acciones críticas realizadas en la plataforma. Este subsistema abarca los módulos de**Usuarios**,**Roles y Permisos**, y**Auditoría**.
 # Subsistema de Reportes y Estadísticas
 El Subsistema de Reportes y Estadísticas es el componente encargado de procesar y consolidar la información operativa de la plataforma para la toma de decisiones y el cumplimiento normativo. Su función principal es recopilar los datos generados en el día a día para estructurar análisis estadísticos que sirvan como insumo en los trabajos de investigación de la facultad. Este subsistema abarca el módulo de**Estadísticas y Reportes**.
 ## 2.3 Módulos del Proyecto
@@ -88,13 +88,13 @@ Su propósito es sistematizar la recolección de los datos médicos iniciales de
 # Gestión de Pacientes
 Su función principal es actuar como el repositorio centralizado del historial de las personas atendidas en el laboratorio. Gestiona el almacenamiento permanente tanto de los datos personales del paciente como de su historial clínico acumulado y resultados previos. Este almacenamiento organizado es crítico para dar respuesta a exigencias legales de resguardo de información y para facilitar la consulta ágil de datos en futuros trabajos de investigación de la facultad.
 # Registro de Análisis
-Este módulo traza el ciclo de vida completo de las muestras microbiológicas dentro del laboratorio. Registra el tipo de análisis, los parámetros o resultados obtenidos, y permite actualizar los estados del estudio secuencialmente (pendiente, en proceso, terminado y validado por un bioquímico). Su valor reside en asegurar un control riguroso de cada etapa clínica, consolidando toda la información relevante al análisis en un único lugar.
+Este módulo traza el ciclo de vida completo de las muestras microbiológicas dentro del laboratorio. Registra el tipo de análisis, los parámetros o resultados obtenidos, y permite actualizar los estados del estudio secuencialmente (pendiente, en proceso, terminado y validado por un bioquímico). Su valor reside en asegurar un control riguroso de cada etapa clínica, consolidando toda la información relevante al análisis en un único lugar. Incluye la gestión de tipos de análisis, la cancelación de estudios y un panel de trabajo para visualizar el volumen de análisis por estado.
 # Emisión de Resultados
 Se encarga de automatizar la entrega final y remota de los diagnósticos a los pacientes. Funciona mediante un flujo de notificación asíncrona que envía un enlace y genera criptográficamente un Token (OTP) de un solo uso, permitiendo al paciente descargar su archivo PDF desde un portal web seguro mediante una doble validación de identidad. Este proceso asegura el cumplimiento estricto de la Ley de Protección de los Datos Personales (Ley 25.326) sin forzar el retiro presencial.
 # Stock de Insumos Reactivos
-Su objetivo es digitalizar la administración del inventario de recursos físicos y químicos. Registra los ingresos y los retiros de insumos realizados por los profesores para las prácticas de los alumnos. Su implementación busca clarificar la trazabilidad operativa para solucionar la actual mala gestión y escasez, evitando problemáticas como el vencimiento de reactivos, el uso ineficiente de materiales nuevos y el desconocimiento de las cantidades exactas.
+Su objetivo es digitalizar la administración del inventario de recursos físicos y químicos. Registra los ingresos y los retiros de insumos realizados por los profesores para las prácticas de los alumnos, incluyendo trazabilidad por lotes, ubicaciones de almacenamiento y devoluciones. Su implementación busca clarificar la trazabilidad operativa para solucionar la actual mala gestión y escasez, evitando problemáticas como el vencimiento de reactivos, el uso ineficiente de materiales nuevos y el desconocimiento de las cantidades exactas.
 # Control de Residuos
-Su función es sistematizar la recolección de datos sobre los desechos generados en las prácticas de laboratorio. Permite registrar de manera exacta la cantidad (volumen y peso) de los residuos químicos producidos por cada actividad. Esto es vital para garantizar el cumplimiento del nuevo reglamento que entró en vigencia en el año 2026, facilitando la generación de reportes mensuales y el adecuado resguardo de los residuos para su tratamiento
+Su función es sistematizar la recolección de datos sobre los desechos generados en las prácticas de laboratorio. Permite registrar de manera exacta la cantidad (volumen y peso) de los residuos químicos producidos por cada actividad, incluyendo el registro de disposición final y la gestión de categorías de peligrosidad. Esto es vital para garantizar el cumplimiento del nuevo reglamento que entró en vigencia en el año 2026, facilitando la generación de reportes mensuales y el adecuado resguardo de los residuos para su tratamiento.
 #### 2.3.2.2 Módulos Adyacentes
 Para que estos módulos principales operen de manera cohesionada y presenten una solución de software segura e integral, se apoyan en los siguientes módulos transversales.
 # Usuarios
@@ -111,7 +111,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis. |
 |**Requisitos asociados**| RF-05 Registro de Ficha Clínica  |
 |**Descripción**| Entidad central que almacena la información demográfica y clínica inicial del paciente al momento de su atención médica.  |
-|**Datos específicos**| Número de registro<br>Fecha de ingreso<br>Nombre y apellido<br>Fecha de nacimiento<br>Edad (campo calculado)<br>DNI<br>Sexo<br>Domicilio<br>Teléfono de contacto<br>Médico derivante<br>Institución<br>Diagnóstico presuntivo.  |
+|**Datos específicos**| Número de registro<br>Fecha de ingreso<br>Nombre y apellido<br>Fecha de nacimiento<br>Edad (campo calculado)<br>DNI<br>Sexo<br>Domicilio<br>Teléfono de contacto<br>Correo Electrónico<br>Obra Social.  |
 |  |  |
 |**Estabilidad**| alta  |
 |**Comentarios**| El campo de edad no se persistirá estáticamente, sino que el sistema lo calculará en tiempo real a partir de la fecha de nacimiento.  |
@@ -121,7 +121,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis.<br>OBJ-03 Emisión Segura y Descarga de Resultados  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.  |
 |**Descripción**| Entidad que traza el ciclo de vida y consolida los resultados científicos de la muestra extraída al paciente.  |
-|**Datos específicos**| Tipo de muestra<br>Cultivo<br>Estado actual (Pendiente, En proceso, Terminado, Validado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.  |
+|**Datos específicos**| Tipo de muestra<br>Estado actual (Pendiente, En proceso, Terminado, Validado, Cancelado, Derivado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.  |
 |  |  |
 |**Estabilidad**| Media |
 |**Comentarios**| - |
@@ -131,7 +131,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |
 |**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control.<br>RF-10 Gestión de Ingresos y Retiros de Inventario. |
 |**Descripción**| Entidad que representa los bienes físicos y reactivos químicos gestionados en el inventario del laboratorio.  |
-|**Datos específicos**| Nombre del reactivo/insumo<br>Cantidad actual (stock disponible)<br>Umbral mínimo de alerta<br>Fecha de vencimiento.  |
+|**Datos específicos**| Nombre del reactivo/insumo<br>Cantidad actual (stock disponible)<br>Umbral mínimo de alerta<br>Número de Lote<br>Unidad de Medida (ml, g, unidades)<br>Categoría<br>Ubicación de Almacenamiento<br>Fecha de Ingreso<br>Fecha de vencimiento.  |
 |  |  |
 |**Estabilidad**| Alta |
 |**Comentarios**| - |
@@ -145,6 +145,36 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |  |  |
 |**Estabilidad**| Alta |
 |**Comentarios**| - |
+
+|**IRQ–05**|**Catálogo de Tipos de Análisis/Muestra**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-16 Gestión de Catálogos Clínicos |
+|**Descripción**| Catálogo de tipos de análisis micológicos y tipos de muestra disponibles en el sistema. |
+|**Datos específicos**| Nombre<br>Descripción<br>Indicaciones asociadas<br>Estado (Activo/Inactivo). |
+|  |  |
+|**Estabilidad**| Media |
+|**Comentarios**| Soporta UC–DIAG-11 (Gestionar Tipos de Análisis y Muestra). |
+
+|**IRQ–06**|**Movimiento de Inventario**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario |
+|**Descripción**| Entidad que registra cada movimiento (ingreso, retiro, devolución) de insumos en el inventario. |
+|**Datos específicos**| Tipo de movimiento (Ingreso/Retiro/Devolución)<br>Fecha<br>Cantidad<br>Lote afectado<br>Usuario responsable<br>Análisis o práctica asociada. |
+|  |  |
+|**Estabilidad**| Media |
+|**Comentarios**| Soporta UC–LAB-07 (Consultar Trazabilidad de Movimientos). |
+
+|**IRQ–07**|**Categoría de Residuo**|
+|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario |
+|**Descripción**| Catálogo de categorías y clases de peligrosidad de los residuos químicos. |
+|**Datos específicos**| Nombre<br>Clase de peligrosidad (Clase I, II, III)<br>Descripción<br>Instrucciones de almacenamiento. |
+|  |  |
+|**Estabilidad**| Media |
+|**Comentarios**| Soporta UC–LAB-10 (Gestionar Categorías de Residuos). |
 
 ## 2.5 Requisitos Funcionales
 |**RF-01**|**Agendamiento de Turnos vía Agente IA**|
@@ -237,6 +267,42 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Descripción**| El sistema debe procesar, cruzar y permitir la exportación de los datos transaccionales generados (clínicos, de inventario y de desechos) para su visualización y análisis. |
 |**Comentarios**| Facilita la toma de decisiones basada en datos operativos reales  |
 
+|**RF-16**|**Gestión de Catálogos Clínicos**|
+|---|---|
+|**Objetivos Asociados**| OBJ-02  |
+|**Descripción**| El sistema debe permitir al Administrador gestionar los tipos de análisis micológicos y tipos de muestra (crear, modificar, desactivar). |
+|**Comentarios**| - |
+
+|**RF-17**|**Gestión de Catálogos de Inventario**|
+|---|---|
+|**Objetivos Asociados**| OBJ-04, OBJ-05  |
+|**Descripción**| El sistema debe permitir al Administrador gestionar las categorías de insumos, ubicaciones de almacenamiento y categorías de residuos. |
+|**Comentarios**| - |
+
+|**RF-18**|**Trazabilidad de Lotes y Vencimientos**|
+|---|---|
+|**Objetivos Asociados**| OBJ-04  |
+|**Descripción**| El sistema debe permitir registrar lotes al ingresar insumos, con número de lote y fecha de vencimiento, y alertar sobre proximidad de vencimiento. El sistema debe consumir primero el lote con vencimiento más próximo al realizar un retiro. |
+|**Comentarios**| Asegura la rotación de inventario y previene el uso de reactivos vencidos. |
+
+|**RF-19**|**Registro de Disposición Final de Residuos**|
+|---|---|
+|**Objetivos Asociados**| OBJ-05  |
+|**Descripción**| El sistema debe permitir registrar la salida y disposición final de los residuos acumulados, con fecha, responsable y método de tratamiento. |
+|**Comentarios**| Asegura el cierre del ciclo de vida del residuo para cumplimiento normativo. |
+
+|**RF-20**|**Modificación de Ficha Clínica**|
+|---|---|
+|**Objetivos Asociados**| OBJ-02  |
+|**Descripción**| El sistema debe permitir al Bioquímico/Doctor modificar una ficha clínica registrada, manteniendo un historial de versiones. |
+|**Comentarios**| Garantiza la trazabilidad de cambios en el historial clínico del paciente. |
+
+|**RF-21**|**Cancelación de Análisis**|
+|---|---|
+|**Objetivos Asociados**| OBJ-02  |
+|**Descripción**| El sistema debe permitir cancelar un análisis en curso (con motivo obligatorio) cuando esté en estado «Pendiente» o «En Proceso». |
+|**Comentarios**| Evita que análisis no viables continúen su procesamiento y libera recursos del laboratorio. |
+
 ## 2.6 Requisitos No Funcionales
 |**RNF-01**|**Disponibilidad Continua del Agente IA**|
 |---|---|
@@ -283,17 +349,17 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 ### 2.7.2 Definición de Actores
 |**ACT–01**|**Bioquímico / Doctor**|
 |---|---|
-|**Descripción**| Usuario del sistema encargado de la atención directa y el procesamiento clínico de las muestras. Posee permisos para registrar consumo de insumos del inventario y la generación de residuos. Gestiona el registro unificado del paciente y su ficha clínica al momento de la consulta, y es el responsable de registrar, actualizar y validar todo el ciclo de vida de los análisis micológicos.  |
+|**Descripción**| Usuario del sistema encargado de la atención directa y el procesamiento clínico de las muestras. Posee permisos para registrar consumo de insumos del inventario y la generación de residuos. Gestiona el registro unificado del paciente y su ficha clínica al momento de la consulta, y es el responsable de registrar, actualizar, modificar, cancelar y validar todo el ciclo de vida de los análisis micológicos.  |
 |**Comentarios**| - |
 
 |**ACT–02**|**Profesor**|
 |---|---|
-|**Descripción**| Usuario del sistema perteneciente al ámbito académico. Su responsabilidad operativa radica en interactuar con el módulo de Recursos de Laboratorio para registrar los retiros y egresos físicos de insumos o reactivos destinados a las prácticas educativas.  |
+|**Descripción**| Usuario del sistema perteneciente al ámbito académico. Su responsabilidad operativa radica en interactuar con el módulo de Recursos de Laboratorio para registrar los retiros y egresos físicos de insumos o reactivos destinados a las prácticas educativas. También registra la generación de residuos químicos producto de las prácticas educativas y puede consultar el inventario y la trazabilidad de movimientos.  |
 |**Comentarios**| - |
 
 |**ACT–03**|**Administrador**|
 |---|---|
-|**Descripción**| Usuario responsable de la gestión administrativa, logística y de seguridad del sistema. Sus funciones abarcan el registro de los ingresos al inventario de recursos y la gestión del control de acceso, autorizando cuentas y asignando los roles correspondientes. Además cumple la misma función que un Bioquímico, pudiendo gestionar análisis e inventario. |
+|**Descripción**| Usuario responsable de la gestión administrativa, logística y de seguridad del sistema. Sus funciones abarcan el registro de los ingresos al inventario de recursos, la gestión de catálogos del sistema (tipos de análisis, insumos, categorías, ubicaciones) y la gestión del control de acceso, autorizando cuentas y asignando los roles correspondientes. Además cumple la misma función que un Bioquímico, pudiendo gestionar análisis e inventario. |
 |**Comentarios**| - |
 
 |**ACT–04**|**Paciente**|
@@ -322,7 +388,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UC–REC-03**|**Reprogramar Turno**|
 |---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención. |
-|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos.<br>RF-03 Gestión de Lista de Espera por Turnos Liberados. |
+|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos.<br>RF-03 Gestión de Reagendación automática. |
 |**Descripción**| El Paciente solicita cambiar la fecha y/o la hora de un turno asignado comunicándose con el Agente IA a través de WhatsApp.  |
 |**Precondición**| El paciente debe tener un turno asignado en el sistema.<br>El sistema debe contar con disponibilidad en la agenda para la nueva fecha/hora solicitada. |
 |**Postcondiciones**| El turno original del paciente queda liberado y se le asigna el nuevo bloque de tiempo.<br>El sistema envía un mensaje con la confirmación de la nueva fecha y hora.<br>La liberación del turno original dispara automáticamente el proceso interno de "Reasignación Automática de Turno Liberado" (UC-REC-04).  |
@@ -330,7 +396,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UC–REC-04**|**Reasignación Automática de Turno Liberado**|
 |---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención. |
-|**Requisitos asociados**| RF-03 Gestión de Lista de Espera por Turnos Liberados. |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática. |
 |**Descripción**| Proceso del sistema que se activa al liberarse un espacio en la agenda (por cancelación o reprogramación). El sistema busca automáticamente al paciente que posea el turno asignado más postergado y le notifica vía WhatsApp ofreciéndole adelantar su cita. Si este no responde en el plazo estricto o rechaza, el sistema iterará ofreciendo el turno al siguiente paciente más lejano.  |
 |**Precondición**| Un turno debe haber sido cancelado o liberado. <br>Deben existir pacientes con turnos asignados en fechas posteriores a la fecha del turno que se acaba de liberar. |
 |**Postcondiciones**|**Si el paciente acepta en tiempo:**Se reprograma su turno a la nueva fecha, enviando confirmación. El turno lejano que dejó vacante se libera, disparando recursivamente este mismo caso de uso.<br>**Si el paciente rechaza o expira el plazo estricto:**El sistema registra la negativa u omisión y envía la oferta de turno al siguiente paciente con el turno más postergado.  |
@@ -417,8 +483,8 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| Si asiste: el estado del turno cambia a "Atendido" y se habilita el flujo para iniciar la consulta. Si no asiste: el estado del turno cambia a "No Asistió", el bloque horario se libera y se dispara UC-REC-04.  |
 
 |**UC–REC-16**|**Registrar Paciente**|
-|---|---|
-|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |
 |**Requisitos asociados**| RF-05 Registro de Ficha Clínica |
 |**Descripción**| El personal autorizado registra a un paciente en el sistema con todos sus datos demográficos completos desde la interfaz web interna. |
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. El paciente no debe existir previamente en la base de datos. |
@@ -484,7 +550,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| Los datos del paciente seleccionado son retornados al caso de uso invocante para continuar su flujo. |
 |**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo ni produce valor por sí mismo. Solo existe como subflujo `<<include>>` de UC-REC-17 y UC-REC-19. |
 
-#### 2.7.3.2 Subsistema Laboratorio Bíoquímico
+#### 2.7.3.2 Subsistema Laboratorio Bioquímico
 |**UC–DIAG-01**|**Registrar Ficha Clínica**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |
@@ -492,13 +558,14 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El Bioquímico/Doctor ingresa al sistema durante la consulta presencial para completar la información clínica estructurada del paciente, enlazándola con los datos demográficos previamente cargados por el Agente IA.  |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.<br>El paciente debe poseer un registro básico en el sistema (Alta Temprana).   |
 |**Postcondiciones**| Se genera y almacena la Ficha Clínica estructurada vinculada de forma unívoca al paciente. <br>El historial clínico queda disponible para la carga de futuros análisis micológicos.  |
+|**Comentarios**| Incluye `<<extend>>` a UC–DIAG-08 (Modificar Ficha Clínica). |
 
 |**UC–DIAG-02**|**Registrar Ingreso de Muestra**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico  |
 |**Descripción**| El Bioquímico/Doctor registra en el sistema la recepción física de la muestra microbiológica del paciente, indicando el tipo de análisis a realizar e iniciando la trazabilidad del estudio.  |
-|**Precondición**| El paciente debe contar con una Ficha Clínica registrada en el sistema. <br>El usuario debe tener una sesión activa con el rol correspondiente.  |
+|**Precondición**| El paciente debe contar con una Ficha Clínica registrada previamente en el sistema (no necesariamente en la sesión actual). <br>El usuario debe tener una sesión activa con el rol correspondiente.  |
 |**Postcondiciones**| Se crea un nuevo registro de Análisis Micológico asociado a la Ficha Clínica del paciente.<br>El estado inicial del análisis se establece automáticamente en "Pendiente".   |
 
 |**UC–DIAG-03**|**Actualizar Estado de Análisis**|
@@ -512,20 +579,12 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UC–DIAG-04**|**Validar Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis.<br>OBJ-03 Emisión Segura y Descarga de Resultados. |
-|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP. |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.<br>RF-08 Validación de Identidad y Descarga de Informe. |
 |**Descripción**| El Bioquímico da por concluido el estudio al emitir su diagnóstico final y aprobar los resultados mediante el sistema, cerrando así el ciclo clínico de la muestra.  |
 |**Precondición**| El Análisis Micológico debe encontrarse en estado "Terminado".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |
-|**Postcondiciones**| El estado del análisis cambia permanentemente a "Validado". <br>El sistema compila estáticamente los datos y genera de inmediato el Informe de Resultados en formato PDF, almacenándolo en el servidor seguro. <br>Se dispara automáticamente el proceso interno de "Notificación de Resultados" (UC-DIAG-05).  |
+|**Postcondiciones**| El estado del análisis cambia permanentemente a "Validado". <br>El sistema compila estáticamente los datos y genera de inmediato el Informe de Resultados en formato PDF, almacenándolo en el servidor seguro. <br>El sistema genera criptográficamente un Token OTP asociado al análisis y envía automáticamente un mensaje de WhatsApp al paciente con el enlace al portal web, las instrucciones y el Token OTP.  |
 
-|**UC–DIAG-05**|**Notificación de Resultados**|
-|---|---|
-|**Objetivos asociados**| OBJ-03 Emisión Segura y Descarga de Resultados  |
-|**Requisitos asociados**| RF-07 Notificación de Disponibilidad de Resultados y OTP  |
-|**Descripción**| Proceso interno del sistema que se activa inmediatamente tras la validación de un análisis. Se encarga de generar la credencial de acceso temporal y avisar al paciente.  |
-|**Precondición**| El caso de uso UC-DIAG-04 (Validar Análisis) debe haber concluido con éxito.  |
-|**Postcondiciones**| El sistema genera criptográficamente un Token OTP (One-Time Password) asociado al análisis. <br>Se envía automáticamente un mensaje de WhatsApp al paciente con el enlace al portal web, las instrucciones y el Token OTP.  |
-
-|**UC–DIAG-06**|**Descargar Informe**|
+|**UC–DIAG-05**|**Descargar Informe**|
 |---|---|
 |**Objetivos asociados**| OBJ-03 Emisión Segura y Descarga de Resultados  |
 |**Requisitos asociados**| RF-08 Validación de Identidad y Descarga de Informe  |
@@ -533,13 +592,50 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El sistema debe tener el PDF almacenado y un Token OTP válido (no expirado/no usado) asociado a ese informe.  |
 |**Postcondiciones**| El sistema coteja el OTP; si es exitoso, autoriza la sesión temporal.<br>Se inicia la descarga segura del Informe de Resultados en formato PDF en el dispositivo del paciente. <br>El Token OTP queda invalidado para prevenir múltiples usos posteriores.  |
 
-|**UC–DIAG-07**|**Consultar Ficha Clínica**|
+|**UC–DIAG-07**|**Consultar Historial de Paciente**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |
 |**Requisitos asociados**| RF-05 Registro de Ficha Clínica  |
 |**Descripción**| El personal autorizado accede al repositorio centralizado para buscar y visualizar el historial médico acumulado de un paciente, sus consultas previas y los estados de sus análisis micológicos.  |
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |
 |**Postcondiciones**| El sistema muestra el listado paginado de pacientes y sus respectivas fichas clínicas, permitiendo la búsqueda mediante filtros opcionales (DNI, Nombre, Rango de Fechas). Operación de solo lectura.  |
+
+|**UC–DIAG-08**|**Modificar Ficha Clínica**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-20 Modificación de Ficha Clínica |
+|**Descripción**| El Bioquímico/Doctor modifica una ficha clínica previamente registrada, corrigiendo errores o agregando información complementaria. |
+|**Precondición**| La ficha clínica debe existir y no estar asociada a un análisis en estado «Validado». |
+|**Postcondiciones**| Los cambios quedan registrados. Se almacena una versión histórica de la ficha original (audit trail de modificaciones). |
+|**Comentarios**| Incluye `<<include>>` UC-REC-S-01 (Buscar Paciente). Cuando el análisis ya fue validado, la modificación se restringe a campos no clínicos (ej. observaciones administrativas). |
+
+|**UC–DIAG-09**|**Cancelar Análisis**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-21 Cancelación de Análisis |
+|**Descripción**| El Bioquímico/Doctor cancela un análisis micológico en curso, registrando el motivo. |
+|**Actor**| Bioquímico/Doctor, Administrador |
+|**Precondición**| El análisis debe existir y estar en estado «Pendiente» o «En Proceso» (no «Validado»). |
+|**Postcondiciones**| El estado del análisis cambia a «Cancelado». Se registra el motivo obligatorio de cancelación. El análisis cancelado permanece en el historial del paciente. |
+
+|**UC–DIAG-10**|**Consultar Panel de Análisis**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico |
+|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico asignado, sin necesidad de navegar paciente por paciente. |
+|**Precondición**| Sesión activa con rol autorizado. |
+|**Postcondiciones**| El sistema presenta una tabla paginada y filtrable de análisis. Operación de solo lectura. Desde este panel se puede acceder al detalle de cada análisis y ejecutar acciones (actualizar estado, validar, cancelar). |
+|**Comentarios**| Diferente de DIAG-07 (que muestra el historial de un paciente). Este UC muestra el volumen de trabajo del laboratorio. |
+
+|**UC–DIAG-11**|**Gestionar Tipos de Análisis y Muestra**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-16 Gestión de Catálogos Clínicos |
+|**Descripción**| El Administrador gestiona el catálogo de tipos de análisis micológicos y tipos de muestra disponibles en el sistema (crear, modificar, desactivar). |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. |
+|**Postcondiciones**| El catálogo queda actualizado. Los tipos desactivados no pueden seleccionarse en nuevos análisis, pero se preservan en registros históricos. |
+|**Comentarios**| Incluye sub-flujos: Crear Tipo, Modificar Tipo, Desactivar Tipo (baja lógica). |
 
 #### 2.7.3.3 Subsistema Recursos de Laboratorio
 |**UC–LAB-01**|**Registrar Ingreso de Insumos**|
@@ -554,7 +650,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |---|---|
 |**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |
 |**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario.<br>RF-09 Alertas de Stock en Panel de Control. |
-|**Descripción**| El Profesor o el Bioquímico registran el consumo o retiro de reactivos necesarios para las prácticas educativas o los análisis clínicos, deduciendo inmediatamente las cantidades del inventario.  |
+|**Descripción**| El Profesor o el Bioquímico registran el consumo o retiro de reactivos necesarios para las prácticas educativas o los análisis clínicos, deduciendo inmediatamente las cantidades del inventario. El sistema debe registrar el análisis micológico o la práctica educativa a la que se destina el retiro (trazabilidad), el lote del insumo consumido (FIFO/FEFO), la ubicación de almacenamiento de origen, y si corresponde a la disposición final de un residuo.  |
 |**Precondición**| El usuario debe tener una sesión activa con los permisos correspondientes (Profesor, Bioquímico o Administrador). <br>El sistema debe contar con stock disponible igual o mayor a la cantidad que se desea retirar.  |
 |**Postcondiciones**| El sistema deduce de forma directa e inmediata la cantidad solicitada del stock activo. <br>Si el stock restante alcanza el umbral mínimo configurado o se acerca a la fecha de vencimiento, el sistema dispara y muestra una alerta visual en el dashboard. |
 
@@ -571,7 +667,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |
 |**Requisitos asociados**| RF-12 Generación de Reporte Mensual de Residuos  |
 |**Descripción**| El sistema procesa y consolida automáticamente los registros de desechos cargados durante el mes en curso para generar el documento estructurado exigido por las normativas vigentes.  |
-|**Precondición**| El usuario solicitante debe tener los privilegios administrativos o directivos necesarios.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
 |**Postcondiciones**| Se emite un documento (reporte) que detalla las cantidades y tipos de residuos químicos generados en el mes.  |
 
 |**UC–LAB-05**|**Consultar Inventario**|
@@ -581,6 +677,86 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| Los usuarios internos acceden al módulo de recursos para visualizar el listado completo de reactivos e insumos físicos disponibles en el laboratorio, conociendo las cantidades exactas y sus estados.  |
 |**Precondición**| El usuario debe tener una sesión activa (Administrador, Bioquímico/Doctor o Profesor).  |
 |**Postcondiciones**| El sistema despliega una vista paginada del inventario actual, permitiendo aplicar filtros opcionales (por nombre, tipo o insumos próximos a vencer/agotar). Operación de solo lectura sin alteración de datos.  |
+
+|**UC–LAB-06**|**Gestionar Catálogo de Insumos**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario |
+|**Descripción**| El Administrador gestiona el catálogo de tipos de insumos y reactivos: crear, modificar y desactivar (baja lógica). |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. |
+|**Postcondiciones**| El catálogo queda actualizado. Los insumos desactivados no pueden recibir nuevos ingresos o retiros, pero sus movimientos históricos se preservan. |
+|**Comentarios**| Datos del insumo: nombre, descripción, unidad de medida (ml, g, unidades), categoría, umbral mínimo de alerta, ubicación de almacenamiento. |
+
+|**UC–LAB-07**|**Consultar Trazabilidad de Movimientos**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario |
+|**Descripción**| El usuario autorizado consulta el historial completo de movimientos (ingresos, retiros, devoluciones) de un insumo o de todos los insumos en un rango de fechas. |
+|**Actor**| Administrador, Bioquímico/Doctor, Profesor |
+|**Precondición**| Sesión activa con rol autorizado. |
+|**Postcondiciones**| El sistema presenta una tabla cronológica de movimientos con: fecha, tipo de movimiento, usuario, cantidad, lote afectado, y análisis/práctica asociada. Operación de solo lectura. |
+|**Comentarios**| Filtrable por insumo, tipo de movimiento, rango de fechas, usuario. |
+
+|**UC–LAB-08**|**Configurar Umbrales de Alerta**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control |
+|**Descripción**| El Administrador configura los umbrales mínimos de stock y los días de anticipación para alertas de vencimiento de cada insumo. |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. El insumo debe existir en el catálogo. |
+|**Postcondiciones**| Los umbrales quedan configurados. El dashboard reflejará alertas cuando el stock esté por debajo del umbral o un lote esté dentro del período de pre-vencimiento. |
+|**Comentarios**| Umbrales por defecto: stock mínimo = 1 unidad, alerta de vencimiento = 30 días. El Administrador puede sobrescribirlos por insumo. |
+
+|**UC–LAB-09**|**Registrar Devolución de Insumos**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario |
+|**Descripción**| El Profesor o Bioquímico registra la devolución de insumos no utilizados al inventario, revirtiendo total o parcialmente un retiro previo. |
+|**Actor**| Profesor, Bioquímico/Doctor, Administrador |
+|**Precondición**| Debe existir un retiro previo registrado. La cantidad a devolver no puede superar la cantidad retirada. |
+|**Postcondiciones**| El stock del insumo se incrementa en la cantidad devuelta. Se registra el movimiento como «Devolución» vinculado al retiro original. |
+|**Comentarios**| Si el lote original ya venció, el sistema advierte y la devolución se registra como «Vencido — no utilizable». |
+
+|**UC–LAB-10**|**Gestionar Categorías de Residuos**|
+|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario |
+|**Descripción**| El Administrador gestiona el catálogo de categorías/clases de peligrosidad de residuos químicos (crear, modificar, desactivar). |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. |
+|**Postcondiciones**| El catálogo queda actualizado. Las categorías desactivadas no pueden seleccionarse en nuevos registros de residuos. |
+|**Comentarios**| Datos de la categoría: nombre, clase de peligrosidad (ej. Clase I, II, III), descripción, instrucciones de almacenamiento. |
+
+|**UC–LAB-11**|**Consultar y Modificar Registro de Residuos**|
+|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
+|**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos |
+|**Descripción**| El usuario autorizado consulta el historial de residuos generados en un período y, si es necesario, corrige un registro erróneo (antes de que se consolide en el reporte mensual). |
+|**Actor**| Administrador, Bioquímico/Doctor, Profesor |
+|**Precondición**| Sesión activa con rol autorizado. El registro a modificar no debe haber sido incluido en un reporte mensual ya emitido. |
+|**Postcondiciones**| Los datos del residuo quedan actualizados. Se registra la modificación en auditoría. |
+|**Comentarios**| Sub-flujos: Consultar (listado filtrable por fecha, categoría, usuario), Modificar (solo el autor o Administrador). |
+
+|**UC–LAB-12**|**Gestionar Categorías de Insumos**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario |
+|**Descripción**| El Administrador gestiona el catálogo de categorías de insumos (reactivos, medios de cultivo, materiales descartables, equipos). |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. |
+|**Postcondiciones**| El catálogo queda actualizado. Los insumos pueden clasificarse por categoría. |
+|**Comentarios**| Facilita filtros en consultas de inventario (LAB-05) y reportes (LAB-13). |
+
+|**UC–LAB-13**|**Generar Reporte de Inventario**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario.<br>RF-09 Alertas de Stock en Panel de Control |
+|**Descripción**| El Administrador genera un reporte del estado del inventario en un momento dado, incluyendo stock actual, movimientos del período, insumos bajo umbral y próximos a vencer. |
+|**Actor**| Administrador, Bioquímico/Doctor |
+|**Precondición**| Sesión activa con rol autorizado. |
+|**Postcondiciones**| El sistema emite un reporte en formato PDF o CSV con el resumen del inventario. |
+|**Comentarios**| Complementa a LAB-05 (consulta en pantalla) con una versión exportable para auditorías o planificación de compras. |
 
 #### 2.7.3.4 Subsistema Acceso y Seguridad
 |**UC–SEG-01**|**Iniciar Sesión**|
@@ -617,7 +793,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| El sistema emite un conjunto de datos consolidado para su visualización y permite su descarga en formato compatible para análisis externo (exportación).  |
 
 ## 2.8 Casos de Uso Extendidos
-### 2.8.1 Subsistema Gestión Clínica
+### 2.8.1 Subsistema Gestión de Pacientes
 |**UCE–REC-01**|**Agendar Turno**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |  |
@@ -632,7 +808,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 5 | El paciente selecciona un horario.  |
 |  | 6 | El sistema registra y reserva el turno a nombre del paciente.  |
 |  | 7 | El sistema envía automáticamente un mensaje de confirmación y las indicaciones médicas predefinidas.  |
-|  | 8 | El sistema programa en cola el envío de un recordatorio de asistencia (`<<include>>` Enviar Recordatorio de Turno).  |
+|  | 8 | El sistema programa en cola el envío de un recordatorio de asistencia.  |
 |**Postcondición**| El turno queda registrado y reservado. |  |
 |**Excepciones**|**Paso**|  |
 |  | 3 | Si el formato del DNI es inválido, el sistema solicita su reingreso iterando este paso.  |
@@ -670,7 +846,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UCE–REC-03**|**Reprogramar Turno**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |  |
-|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos <br>RF-03 Gestión de Lista de Espera por Turnos Liberados  |  |
+|**Requisitos asociados**| RF-04 Cancelación y Reprogramación de Turnos <br>RF-03 Gestión de Reagendación automática  |  |
 |**Descripción**| El Paciente solicita cambiar la fecha y/o la hora de un turno asignado comunicándose con el Agente IA a través de WhatsApp.  |  |
 |**Precondición**| El paciente debe tener un turno asignado en el sistema <br>Faltan más de 24 horas para la cita original.<br>El turno no fue reprogramado más de 2 veces previas. |  |
 |**Secuencia normal**|**Paso**|  |
@@ -695,7 +871,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UCE–REC-04**|**Reasignación Automática de Turno Liberado**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |  |
-|**Requisitos asociados**| RF-03 Gestión de Lista de Espera por Turnos Liberados  |  |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática  |  |
 |**Descripción**| Proceso del sistema que se activa al liberarse un espacio. Busca automáticamente al paciente con el turno asignado más postergado y le ofrece adelantar su cita.  |  |
 |**Precondición**| Un turno debe haber sido cancelado o liberado. <br>Deben existir pacientes con turnos en fechas posteriores.  |  |
 |**Secuencia normal**|**Paso**|  |
@@ -751,7 +927,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Excepciones**|**Paso**|  |
 |  | - | - |
 |**Rendimiento**|**Paso**|  |
-|  | 6 | Menos de 2 segundos |
+|  | 3 | Menos de 2 segundos |
 |**Frecuencia**| Alta |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
@@ -804,6 +980,9 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| El desbloqueo sigue el mismo flujo inverso, seleccionando días bloqueados y presionando "Desbloquear". |  |
+
+
+*Nota: No existe UC–REC-09. La numeración salta intencionalmente de UC–REC-08 a UC–REC-10.*
 
 
 |**UCE–REC-10**|**Crear Indicación Médica**|  |
@@ -926,9 +1105,9 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 3 | El sistema despliega un diálogo con las opciones "Presente" y "Ausente". |
 |  | 4 | El usuario selecciona "Presente". |
 |  | 5 | El sistema cambia el estado del turno a "Atendido" y registra la hora de atención. |
-|  | 5.1 | El sistema verifica si el paciente tiene datos demográficos incompletos (falta dirección, obra social, etc.). Si es así, muestra un formulario ligero para que el administrativo complete los datos faltantes antes de continuar. |
-|  | 6 | El sistema registra el evento en la tabla de auditoría. |
-|  | 7 | La interfaz confirma la operación y habilita el botón para iniciar la consulta (UC-DIAG-01). |
+|  | 6 | El sistema verifica si el paciente tiene datos demográficos incompletos (falta dirección, obra social, etc.). Si es así, muestra un formulario ligero para que el administrativo complete los datos faltantes antes de continuar. |
+|  | 7 | El sistema registra el evento en la tabla de auditoría. |
+|  | 8 | La interfaz confirma la operación y habilita el botón para iniciar la consulta (UC-DIAG-01). |
 |**Secuencia normal (Ausente)**|**Paso**|  |
 |  | 1 | El usuario sigue los pasos 1 a 3 de la secuencia normal (Presente). |
 |  | 2 | El usuario selecciona "Ausente". |
@@ -1081,7 +1260,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 8 | Menos de 1 segundo |
 |**Frecuencia**| Media |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| Reemplaza la funcionalidad de "Agendar" del antiguo UC-REC-09. Gestiona pacientes que llaman por teléfono, adultos mayores sin WhatsApp o urgencias. |  |
+|**Comentarios**| Gestiona pacientes que llaman por teléfono, adultos mayores sin WhatsApp o urgencias. |  |
 
 |**UCE–REC-21**|**Cancelar Turno Manualmente**|  |
 |---|---|---|
@@ -1109,7 +1288,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 6-7 | Menos de 1 segundo |
 |**Frecuencia**| Media |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| Reemplaza la funcionalidad de "Cancelar" del antiguo UC-REC-09. |  |
+|**Comentarios**| - |  |
 
 |**UCE–REC-22**|**Reprogramar Turno Manualmente**|  |
 |---|---|---|
@@ -1139,7 +1318,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 8 | Menos de 1 segundo |
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| Reemplaza la funcionalidad de "Reprogramar" del antiguo UC-REC-09. |  |
+|**Comentarios**| - |  |
 
 |**UCE–REC-S-01**|**Buscar Paciente**|  |
 |---|---|---|
@@ -1163,7 +1342,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo ni produce valor por sí mismo. Solo existe como subflujo `<<include>>` de UC-REC-17 y UC-REC-19. La búsqueda es flexible: DNI (coincidencia exacta), Nombre o Apellido (coincidencia parcial). |  |
 
-### 2.8.2 Subsistema Recursos de Laboratorio
+### 2.8.2 Subsistema Laboratorio Bioquímico
 |**UCE–DIAG-01**|**Registrar Ficha Clínica**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
@@ -1173,13 +1352,13 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El Bioquímico ingresa al módulo de Pacientes en la interfaz web y presiona "Nueva Consulta".  |
 |  | 2 | El Bioquímico ingresa el DNI del paciente en el buscador.  |
-|  | 3 | El Backend consulta la base de datos y recupera los datos demográficos registrados previamente por el Agente IA.  |
+|  | 3 | El sistema consulta la base de datos y recupera los datos demográficos registrados previamente por el Agente IA.  |
 |  | 4 | La interfaz despliega el formulario de "Ficha Clínica" pre-poblado con los datos del paciente.  |
-|  | 5 | El Bioquímico completa los campos clínicos obligatorios (Institución, Diagnóstico presuntivo, etc.) y presiona "Guardar Ficha".  |
+|  | 5 | El Bioquímico completa los campos clínicos obligatorios y presiona "Guardar Ficha".  |
 |  | 6 | La interfaz realiza una validación de campos vacíos o formatos incorrectos (Frontend).  |
-|  | 7 | El Backend recibe la petición, procesa la persistencia en la base de datos y vincula la Ficha al ID del Paciente.  |
-|  | 8 | El Backend envía un código de estado HTTP 200 (Éxito).  |
-|  | 9 | interfaz muestra un mensaje de "Ficha guardada exitosamente" y habilita el botón para el paso secuencial de Ingreso de Muestra.  |
+|  | 7 | El sistema recibe la petición, procesa la persistencia en la base de datos y vincula la Ficha al ID del Paciente.  |
+|  | 8 | El sistema envía un código de estado HTTP 200 (Éxito).  |
+|  | 9 | La interfaz muestra un mensaje de "Ficha guardada exitosamente" y habilita el botón para el paso secuencial de Ingreso de Muestra.  |
 |**Postcondición**| Se genera y almacena la Ficha Clínica estructurada vinculada al paciente.  |  |
 |**Excepciones**|**Paso**|  |
 |  | 3 | Si el DNI no existe en el sistema, la interfaz emite una alerta indicando "Paciente no encontrado" y habilita un formulario de registro manual de emergencia.  |
@@ -1214,7 +1393,11 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
 
-### 2.8.3 Subsistema Acceso y Seguridad
+### 2.8.3 Subsistema Recursos de Laboratorio
+
+*UCEs pendientes de desarrollo. Se requiere desarrollar los UCE correspondientes a UC–LAB-01 (Registrar Ingreso de Insumos), UC–LAB-02 (Registrar Retiro de Insumos), UC–LAB-03 (Registrar Generación de Residuos), UC–LAB-04 (Generar Reporte de Residuos), UC–LAB-05 (Consultar Inventario), y los nuevos UC–LAB-06 a UC–LAB-13.*
+
+### 2.8.4 Subsistema Acceso y Seguridad
 |**UCE–SEG-01**|**Iniciar Sesion**|  |
 |---|---|---|
 |**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
@@ -1240,7 +1423,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
 
-### 2.8.4 Subsistema Reportes y estadísticas
+### 2.8.5 Subsistema Reportes y Estadísticas
 |**UCE–REP-01**|**Consolidar y Exportar Datos Operativos**|  |
 |---|---|---|
 |**Objetivos asociados**| Transversal (Generación de Información)  |  |
@@ -1269,4 +1452,12 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 # Glosario de Términos
 |**Término**|**Categoría**|**Comentarios**|
 |---|---|---|
-|  |  |  |
+| Agente IA | Arquitectura | Componente de software que interactúa con los pacientes de forma asíncrona a través de WhatsApp para la autogestión de turnos (agendamiento, cancelación, reprogramación y consulta). |
+| OTP (One-Time Password) | Seguridad | Token criptográfico de un solo uso generado por el sistema y enviado al paciente vía WhatsApp. Permite validar su identidad de forma anónima en el portal web de descarga de resultados. |
+| Token | Seguridad | Credencial digital generada por el sistema para autenticación o autorización temporal. Incluye tanto el OTP para pacientes como el JWT para sesiones de usuarios internos. |
+| Alta Temprana | Clínico | Registro inicial mínimo de un paciente en la base de datos, creado por el Agente IA al momento del agendamiento del turno. Contiene únicamente DNI y Nombre Completo. |
+| Baja lógica | Seguridad / Datos | Mecanismo de desactivación de un registro (paciente, usuario, indicación médica) que marca su estado como "Inactivo" sin eliminar físicamente los datos, preservando la integridad referencial y el historial. |
+| Ficha Clínica | Clínico | Documento digital estructurado que contiene la información médica del paciente recolectada durante la consulta presencial. Incluye datos demográficos completos y diagnóstico clínico. |
+| Muestra | Clínico | Material biológico (ej. uñas, piel, cabello) extraído del paciente para su análisis microbiológico en el laboratorio. |
+| Micología | Dominio | Rama de la biología que estudia los hongos. En el contexto del sistema, el laboratorio se especializa en el diagnóstico de infecciones fúngicas (micosis) en pacientes. |
+| JWT (JSON Web Token) | Seguridad | Estándar abierto (RFC 7519) utilizado para la autenticación de usuarios internos. El sistema genera un token JWT al iniciar sesión y lo inyecta en el navegador para validar sesiones subsecuentes. |
