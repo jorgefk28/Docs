@@ -1,0 +1,309 @@
+﻿classDiagram
+    direction TB
+
+    Paciente "1" --> "0..N" FichaClinica : "Posee historial en"
+    Paciente "1" --> "0..N" Turno : "Reserva"
+    Paciente "N" --> "1" Usuario : "Es desactivado por"
+
+    FichaClinica "1" --> "0..N" AnalisisMicologico : "Origina"
+    FichaClinica "1" --> "0..N" VersionFichaClinica : "Mantiene historial en"
+    FichaClinica "N" --> "1" Usuario : "Es registrada por"
+
+    VersionFichaClinica "N" --> "1" Usuario : "Es generada por"
+
+    Turno "N" --> "1" Paciente : "Pertenece a"
+    Turno "N" --> "1" TipoAnalisis : "Se agenda para"
+    Turno "N" --> "1" IndicacionMedica : "Incluye"
+
+    IndicacionMedica "N" --> "1" TipoAnalisis : "Está asociada a"
+
+    AnalisisMicologico "N" --> "1" FichaClinica : "Se origina en"
+    AnalisisMicologico "N" --> "1" TipoAnalisis : "Es de tipo"
+    AnalisisMicologico "N" --> "0..1" Usuario : "Es validado por"
+    AnalisisMicologico "1" --> "0..1" Otp : "Genera"
+    AnalisisMicologico "1" --> "0..1" InformeResultados : "Genera"
+    AnalisisMicologico "1" --> "0..N" MovimientoInventario : "Consume insumos en"
+    AnalisisMicologico "1" --> "0..N" ResiduoQuimico : "Produce"
+
+    Otp "1" <--> "1" InformeResultados : "Habilita descarga de"
+
+    Insumo "N" --> "1" CategoriaInsumo : "Se clasifica en"
+    Insumo "N" --> "1" UbicacionAlmacenamiento : "Se almacena en"
+    Insumo "1" --> "0..N" Lote : "Se recibe en"
+
+    Lote "N" --> "1" Insumo : "Pertenece a"
+    Lote "1" --> "0..N" MovimientoInventario : "Registra movimientos en"
+
+    MovimientoInventario "N" --> "1" Lote : "Afecta a"
+    MovimientoInventario "N" --> "1" Usuario : "Es ejecutado por"
+    MovimientoInventario "N" --> "1" UbicacionAlmacenamiento : "Se retira/ingresa en"
+    MovimientoInventario "N" --> "0..1" AnalisisMicologico : "Se asocia a"
+    MovimientoInventario "N" --> "0..1" MovimientoInventario : "Revierte a"
+
+    ResiduoQuimico "N" --> "1" CategoriaResiduo : "Pertenece a"
+    ResiduoQuimico "N" --> "1" Usuario : "Es registrado por"
+    ResiduoQuimico "N" --> "0..1" AnalisisMicologico : "Proviene de"
+    ResiduoQuimico "N" --> "0..1" DisposicionFinal : "Recibe"
+    ResiduoQuimico "N" --> "0..1" Reporte : "Es consolidado en"
+
+    DisposicionFinal "N" --> "1" Usuario : "Es ejecutada por"
+
+    Usuario "N" --> "1" Rol : "Posee"
+    Usuario "1" --> "0..N" Auditoria : "Genera registros en"
+    Usuario "1" --> "0..N" Reporte : "Genera"
+    Usuario "1" --> "0..1" ConfiguracionAgenda : "Configura"
+    Usuario "1" --> "0..N" BloqueoAgenda : "Ejecuta"
+
+    class Paciente {
+        +integer id
+        +string numero_registro
+        +string dni
+        +string nombre
+        +string apellido
+        +date fecha_nacimiento
+        +string sexo
+        +string domicilio
+        +string telefono
+        +string correo_electronico
+        +string obra_social
+        +string estado
+        +datetime fecha_ingreso
+    }
+
+    class FichaClinica {
+        +integer id
+        +integer paciente_id
+        +integer bioquimico_id
+        +datetime fecha_consulta
+        +text datos_clinicos
+        +integer version_actual
+        +string estado
+    }
+
+    class VersionFichaClinica {
+        +integer id
+        +integer ficha_clinica_id
+        +integer numero_version
+        +text datos_previos
+        +text datos_nuevos
+        +integer usuario_id
+        +datetime fecha_modificacion
+        +string motivo
+    }
+
+    class Turno {
+        +integer id
+        +integer paciente_id
+        +integer tipo_analisis_id
+        +integer indicacion_medica_id
+        +datetime fecha_hora
+        +string estado
+        +integer reprogramaciones
+        +string motivo_cancelacion
+        +datetime fecha_creacion
+        +datetime fecha_atencion
+    }
+
+    class IndicacionMedica {
+        +integer id
+        +string titulo
+        +text contenido
+        +integer tipo_analisis_id
+        +string estado
+        +datetime fecha_creacion
+        +datetime fecha_modificacion
+    }
+
+    class ConfiguracionAgenda {
+        +integer id
+        +string dias_habiles
+        +time horario_inicio_manana
+        +time horario_fin_manana
+        +time horario_inicio_tarde
+        +time horario_fin_tarde
+        +integer duracion_turno
+        +integer intervalo_entre_turnos
+        +integer max_turnos_por_franja
+        +text periodos_inhabiles
+        +integer usuario_modificacion_id
+        +datetime fecha_modificacion
+    }
+
+    class BloqueoAgenda {
+        +integer id
+        +date fecha_inicio
+        +date fecha_fin
+        +time hora_inicio
+        +time hora_fin
+        +string tipo_bloqueo
+        +string motivo
+        +integer usuario_id
+        +datetime fecha_bloqueo
+        +string estado
+    }
+
+    class AnalisisMicologico {
+        +integer id
+        +integer ficha_clinica_id
+        +integer tipo_analisis_id
+        +integer bioquimico_validador_id
+        +string tipo_muestra
+        +string estado
+        +text observaciones
+        +text resultado_final
+        +datetime fecha_creacion
+        +datetime fecha_validacion
+        +string motivo_cancelacion
+    }
+
+    class TipoAnalisis {
+        +integer id
+        +string nombre
+        +text descripcion
+        +text indicaciones_asociadas
+        +string estado
+    }
+
+    class Otp {
+        +integer id
+        +integer analisis_id
+        +string token
+        +datetime fecha_generacion
+        +datetime fecha_expiracion
+        +boolean usado
+        +datetime fecha_uso
+    }
+
+    class InformeResultados {
+        +integer id
+        +integer analisis_id
+        +string ruta_archivo
+        +datetime fecha_generacion
+        +string hash_archivo
+    }
+
+    class Insumo {
+        +integer id
+        +string nombre
+        +text descripcion
+        +string unidad_medida
+        +integer categoria_id
+        +integer ubicacion_id
+        +real stock_actual
+        +real umbral_minimo
+        +integer dias_alerta_vencimiento
+        +string estado
+        +datetime fecha_creacion
+    }
+
+    class Lote {
+        +integer id
+        +integer insumo_id
+        +string numero_lote
+        +date fecha_ingreso
+        +date fecha_vencimiento
+        +real cantidad_inicial
+        +real cantidad_actual
+        +string estado
+    }
+
+    class MovimientoInventario {
+        +integer id
+        +integer insumo_id
+        +integer lote_id
+        +integer usuario_id
+        +integer ubicacion_id
+        +integer analisis_id
+        +integer devolucion_referencia_id
+        +string tipo_movimiento
+        +real cantidad
+        +string practica_educativa
+        +datetime fecha
+    }
+
+    class CategoriaInsumo {
+        +integer id
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class UbicacionAlmacenamiento {
+        +integer id
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class ResiduoQuimico {
+        +integer id
+        +integer categoria_residuo_id
+        +integer usuario_id
+        +integer analisis_id
+        +integer disposicion_final_id
+        +datetime fecha_hora
+        +real volumen
+        +real peso
+        +text descripcion
+        +integer reporte_mensual_id
+    }
+
+    class DisposicionFinal {
+        +integer id
+        +integer usuario_id
+        +datetime fecha
+        +string metodo_tratamiento
+        +text descripcion
+    }
+
+    class CategoriaResiduo {
+        +integer id
+        +string nombre
+        +string clase_peligrosidad
+        +text descripcion
+        +text instrucciones_almacenamiento
+        +string estado
+    }
+
+    class Usuario {
+        +integer id
+        +integer rol_id
+        +string nombre
+        +string apellido
+        +string correo_electronico
+        +string contrasena_hash
+        +string estado
+        +integer intentos_fallidos
+        +datetime bloqueado_hasta
+        +datetime fecha_registro
+    }
+
+    class Rol {
+        +integer id
+        +string nombre
+        +text descripcion
+    }
+
+    class Auditoria {
+        +integer id
+        +integer usuario_id
+        +datetime fecha_hora
+        +string direccion_ip
+        +string modulo
+        +string accion
+        +string entidad_afectada
+        +integer entidad_id
+        +text cambio_realizado
+    }
+
+    class Reporte {
+        +integer id
+        +integer usuario_id
+        +string tipo_reporte
+        +date rango_fecha_inicio
+        +date rango_fecha_fin
+        +string ruta_archivo
+        +string formato_archivo
+        +datetime fecha_generacion
+        +string mes_anio
+    }
