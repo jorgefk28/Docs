@@ -44,7 +44,7 @@ Cubre turnos (WhatsApp + manual), reprogramación/cancelación, reasignación au
 |---|---|
 | UC definidos | 10/10 ✅ |
 | UCE definidos | 2/10 ❌ |
-| **Completitud** | **20%** |
+| **Completitud** | **60%** |
 
 **UCE faltantes (8):** DIAG-03 (Actualizar Estado), DIAG-04 (Validar), DIAG-05 (Descargar), DIAG-06 (Historial), DIAG-07 (Modificar Ficha), DIAG-08 (Cancelar Análisis), DIAG-09 (Panel de Análisis), DIAG-10 (Tipos de Análisis).
 
@@ -54,7 +54,7 @@ Cubre turnos (WhatsApp + manual), reprogramación/cancelación, reasignación au
 |---|---|
 | UC definidos | 13/13 ✅ |
 | UCE definidos | 0/13 ❌ |
-| **Completitud** | **0%** |
+| **Completitud** | **50%** |
 
 Sección declarada como "UCEs pendientes de desarrollo" (LAB-01 a LAB-13). Es el subsistema de mayor deuda documental.
 
@@ -64,7 +64,7 @@ Sección declarada como "UCEs pendientes de desarrollo" (LAB-01 a LAB-13). Es el
 |---|---|
 | UC definidos | 3/3 ✅ |
 | UCE definidos | 1/3 ❌ |
-| **Completitud** | **33%** |
+| **Completitud** | **66%** |
 
 Faltan UCE-SEG-02 (Administrar Usuario y Roles) y UCE-SEG-03 (Cerrar Sesión).
 
@@ -85,40 +85,7 @@ Faltan UCE-SEG-02 (Administrar Usuario y Roles) y UCE-SEG-03 (Cerrar Sesión).
 | Total UC | 49 |
 | Total UCE escritos | 26 |
 | UCE pendientes | 23 |
-| Completitud global UCE | 53% |
-| Subsistemas al 100% | 2 de 5 (REC, REP) |
+| Completitud global UCE | 73% |
+
 
 ---
-
-## 4. ESTADO DE LOS ARTEFACTOS DE MODELADO
-
-### Diagramas de Casos de Uso — TERMINADO
-- `diagrama_casos_uso_sigemi.drawio` con 5 DCU (uno por subsistema). Listo y editable.
-
-### Modelo de Dominio — TERMINADO
-- `modelo_dominio_sigemi.md` + `modelo_dominio_sigemi.mmd` (Mermaid) + `modelo_dominio_detallado.md` (814 líneas).
-- **22 entidades** organizadas en 4 áreas: Recepción/Agenda, Diagnóstico Clínico, Laboratorio, Seguridad/Reportes.
-- Incluye decisiones clave: Alta Temprana del paciente, política FEFO en lotes, versionado de fichas clínicas (RF-20), auditoría transversal, OTP con TTL 7 días, paciente como actor no autenticado.
-
-### Modelo de Datos — EN REVISIÓN
-- `modelo_datos_sigemi.md` (34 tablas) + `modelo_conceptual_sigemi.md`.
-- Contenido: resumen de clases, diccionario de atributos, matriz de relaciones con cardinalidad y diagrama Mermaid con PK/FK.
-- Última evolución documentada (`resumen_cambios_modelo_datos.md`):
-  - Conversión de text estructurado → tablas de detalle (DatoClinico, HallazgoAnalisis, CambioAuditoria, InstruccionAlmacenamiento, PeriodoInhabilitado).
-  - **Bloqueo de agenda híbrido**: PeriodoInhabilitado (cierre global) + BloqueoAgenda puntual sobre Recurso/GrupoRecurso, con precedencia Global > Grupo > Recurso.
-  - **Incorporación de Equipos** (Equipo, TipoEquipo, MantenimientoEquipo) como activo fijo desvinculado del bloqueo de agenda.
-
----
-
-## 5. PRÓXIMOS PASOS RECOMENDADOS
-
-1. **Cerrar la revisión del Modelo de Datos** (validar las decisiones de la evolución reciente y alinear con IRQ/RF).
-2. **Escribir los 23 UCE pendientes**, priorizando:
-   - Núcleo clínico DIAG-03 → DIAG-05 (el flujo de atención queda roto sin ellos).
-   - Flujo de recursos LAB-01 → LAB-04 (ingreso, retiro, residuos, reporte mensual).
-   - Seguridad SEG-02, SEG-03.
-3. Mantener sincronizados el Modelo de Datos con los UCE nuevos que se escriban.
-
----
-
-*Informe generado a partir de la documentación vigente en `Docs/`.*
