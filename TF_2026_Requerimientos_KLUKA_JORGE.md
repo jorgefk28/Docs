@@ -592,7 +592,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El sistema debe tener el PDF almacenado y un Token OTP válido (no expirado/no usado) asociado a ese informe.  |
 |**Postcondiciones**| El sistema coteja el OTP; si es exitoso, autoriza la sesión temporal.<br>Se inicia la descarga segura del Informe de Resultados en formato PDF en el dispositivo del paciente. <br>El Token OTP queda invalidado para prevenir múltiples usos posteriores.  |
 
-|**UC–DIAG-07**|**Consultar Historial de Paciente**|
+|**UC–DIAG-06**|**Consultar Historial de Paciente**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |
 |**Requisitos asociados**| RF-05 Registro de Ficha Clínica  |
@@ -600,7 +600,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |
 |**Postcondiciones**| El sistema muestra el listado paginado de pacientes y sus respectivas fichas clínicas, permitiendo la búsqueda mediante filtros opcionales (DNI, Nombre, Rango de Fechas). Operación de solo lectura.  |
 
-|**UC–DIAG-08**|**Modificar Ficha Clínica**|
+|**UC–DIAG-07**|**Modificar Ficha Clínica**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-20 Modificación de Ficha Clínica |
@@ -609,7 +609,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| Los cambios quedan registrados. Se almacena una versión histórica de la ficha original (audit trail de modificaciones). |
 |**Comentarios**| Incluye `<<include>>` UC-REC-S-01 (Buscar Paciente). Cuando el análisis ya fue validado, la modificación se restringe a campos no clínicos (ej. observaciones administrativas). |
 
-|**UC–DIAG-09**|**Cancelar Análisis**|
+|**UC–DIAG-08**|**Cancelar Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-21 Cancelación de Análisis |
@@ -618,7 +618,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El análisis debe existir y estar en estado «Pendiente» o «En Proceso» (no «Validado»). |
 |**Postcondiciones**| El estado del análisis cambia a «Cancelado». Se registra el motivo obligatorio de cancelación. El análisis cancelado permanece en el historial del paciente. |
 
-|**UC–DIAG-10**|**Consultar Panel de Análisis**|
+|**UC–DIAG-09**|**Consultar Panel de Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico |
@@ -627,7 +627,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| El sistema presenta una tabla paginada y filtrable de análisis. Operación de solo lectura. Desde este panel se puede acceder al detalle de cada análisis y ejecutar acciones (actualizar estado, validar, cancelar). |
 |**Comentarios**| Diferente de DIAG-07 (que muestra el historial de un paciente). Este UC muestra el volumen de trabajo del laboratorio. |
 
-|**UC–DIAG-11**|**Gestionar Tipos de Análisis y Muestra**|
+|**UC–DIAG-10**|**Gestionar Tipos de Análisis y Muestra**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-16 Gestión de Catálogos Clínicos |
