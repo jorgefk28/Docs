@@ -1,7 +1,6 @@
-# RESUMEN EJECUTIVO — Estado de Avance del Proyecto SIGEMI
+Estado de Avance del Proyecto SIGEMI
 
 **Sistema Integral de Gestión Micológica — Módulo de Bioquímica y Farmacia (UNaM)**
-**Documento:** `TF_2026_Requerimientos_KLUKA_JORGE.md` (v0.0.0.1, 1.463 líneas)
 **Fecha del informe:** 31/08/2026
 
 ---

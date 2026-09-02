@@ -1,0 +1,8 @@
+Base de datos.
+Estadísticas / Reportes
+ABM
+3 procesos automatizados
+Metodología
+Auditoría
+
+Los procesos/modulos inteligentes no pueden ser parte del MVP
