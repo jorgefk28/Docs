@@ -121,7 +121,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis.<br>OBJ-03 Emisión Segura y Descarga de Resultados  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.  |
 |**Descripción**| Entidad que traza el ciclo de vida y consolida los resultados científicos de la muestra extraída al paciente.  |
-|**Datos específicos**| Tipo de muestra<br>Estado actual (Pendiente, En proceso, Terminado, Validado, Cancelado, Derivado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.  |
+|**Datos específicos**| Tipo de muestra<br>Estado actual (Pendiente, En proceso, Terminado, Validado, Cancelado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.  |
 |  |  |
 |**Estabilidad**| Media |
 |**Comentarios**| - |

@@ -292,7 +292,6 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 | **Análisis — Terminado** | Procesamiento concluido, pendiente de firma | `azul` | → Validado (solo Bioquímico) |
 | **Análisis — Validado** | Firma del bioquímico; **permanente e inmutable**; genera PDF + OTP | `verde` | — (terminal; sin transiciones) |
 | **Análisis — Cancelado** | Baja con `motivo_cancelacion` **obligatorio** (solo desde Pendiente/En Proceso) | `rojo` | — (terminal; queda en historial) |
-| **Análisis — Derivado** | Muestra derivada ⚠️ (sin UC que describa el flujo de derivación) | `violeta` | ⚠️ FALTA DEFINIR |
 | **Lote — Activo** | Disponible para consumo (FEFO: se consume primero el que vence antes) | `verde` | → Agotado el consumirse; → Vencido al pasar la fecha |
 | **Lote — Agotado** | Cantidad remanente = 0 | `gris` | — |
 | **Lote — Vencido** | Pasó `fecha_vencimiento`; no consumible | `rojo` | — |
@@ -313,7 +312,6 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
   - `aviso/ámbar` — En Proceso, stock bajo umbral, vencimiento próximo (dentro de `dias_alerta_vencimiento`), Modificado.
   - `peligro/rojo` — Cancelado, No Asistió, Vencido, Bloqueado, deshabilitado.
   - `neutral/gris` — Pendiente, Inactivo, Histórico, registros de solo lectura.
-  - `info/derivado*` — violeta para Derivado. (*Estado sin flujo definido; ajustar.)
   - La escala neutra: fondos claros (escala de grises azulados), texto de máximo contraste en paneles de trabajo por iluminación del laboratorio.
   - Justificación de dominio: el personal escanea worklists rápidamente; el código de color debe seguir el ciclo de vida clínico (semáforo), **no la marca institucional**. Para residuos, la clase de peligrosidad (I/II/III) debe tener etiquetado propio (⚠️ validar con normativa local si se asigna color por clase).
 - **Tipografía:** UI sans (Inter o similar), 13–14 px para tablas/forms. **Monoespaciada** (JetBrains Mono / IBM Plex) reservada a: número de registro, **DNI**, **número de lote**, **código OTP**, **número de serie** y hashes — IDs que el personal copia/verifica contra etiquetas físicas.
@@ -339,7 +337,6 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 
 1. **Volumen operativo:** ⚠️ ¿Cuántos usuarios por rol, turnos/día y análisis activos espera el sistema en producción? (condiciona densidad y paginación).
 2. **Dispositivos:** ⚠️ ¿Qué hardware real usarán Bioquímicos/Profesores en banco (PC, tablet, pantalla táctil)? ¿Hay acceso a la web desde el banco de cultivo o solo desde consultorio/recepción?
-3. **Qué es "Derivado":** ⚠️ El estado `Derivado` del análisis no tiene caso de uso. ¿A qué corresponde (derivar a otro laboratorio, otro profesional) y quién lo ejecuta?
 4. **Valores de referencia:** ⚠️ ¿Los tipos de análisis necesitan valores de referencia o unidades por parámetro, o los resultados son cualitativos (Observación/Resultado libre) como modela SIGEMI?
 5. **QC formal:** ⚠️ ¿El laboratorio requiere control de calidad estadístico (sueros control, gráficos de Levey-Jennings) o el "QC" queda cubierto por validación del bioquímico + FEFO/alertas de reactivos?
 6. **Resultado crítico:** ⚠️ ¿Debe existir un flujo/alerta especial cuando un hallazgo es un resultado crítico, o todos los resultados siguen el mismo camino hasta la validación?
@@ -355,7 +352,7 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 ## 10. Prompts sugeridos para Figma AI
 
 **1) Panel de Análisis (worklist)**
-> Pantalla de trabajo tipo back-office para laboratorio de micología: tabla densa de análisis con columnas N.º análisis, paciente, tipo de muestra (uñas/piel/cabello), tipo de análisis, estado en píldora de color (Pendiente=gris, En Proceso=ámbar, Terminado=azul, Validado=verde, Cancelado=rojo, Derivado=violeta), fecha ingreso y bioquímico. Filtros arriba: estado, tipo, fecha, bioquímico. Botón "Nueva Consulta". Sin animaciones, filas de 36px, monoespaciada para IDs. Estilo limpio, sidebar izquierda con módulos.
+> Pantalla de trabajo tipo back-office para laboratorio de micología: tabla densa de análisis con columnas N.º análisis, paciente, tipo de muestra (uñas/piel/cabello), tipo de análisis, estado en píldora de color (Pendiente=gris, En Proceso=ámbar, Terminado=azul, Validado=verde, Cancelado=rojo), fecha ingreso y bioquímico. Filtros arriba: estado, tipo, fecha, bioquímico. Botón "Nueva Consulta". Sin animaciones, filas de 36px, monoespaciada para IDs. Estilo limpio, sidebar izquierda con módulos.
 
 **2) Agenda de Turnos**
 > Pantalla de agenda de laboratorio con vista semanal de calendario: columnas por recurso (Sala 3, Laboratorio B), bloques de turno con nombre de paciente, hora, tipo de análisis y estado de turno con color; franjas bloqueadas en gris rayado estilo "no disponible". Barra superior con selector de día/semana/mes, filtro por DNI y botón "Nuevo Turno". Diálogo al hacer clic en bloque para marcar Presente/Ausente, cancelar o reprogramar. Estilo denso y legible, fuente 13px.
