@@ -1,11 +1,11 @@
 <mxfile host="app.diagrams.net" agent="opencode">
   <diagram name="Casos de Uso SIGEMI - 2.7.3" id="sigemi-uc">
-    <mxGraphModel dx="2812" dy="1508" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="2300" math="0" shadow="0">
+    <mxGraphModel dx="681" dy="279" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1850" pageHeight="2300" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="GRP_REC" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;dashed=1;verticalAlign=top;verticalLabelPosition=top;align=center;spacing=8;fontStyle=1;fontSize=13;" value="" vertex="1">
-          <mxGeometry height="780" width="760" x="510" y="80" as="geometry" />
+          <mxGeometry height="740" width="760" x="510" y="80" as="geometry" />
         </mxCell>
         <mxCell id="REC01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-01&#xa;Agendar Turno" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="150" as="geometry" />
@@ -15,9 +15,6 @@
         </mxCell>
         <mxCell id="REC03" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-03&#xa;Reprogramar Turno" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="210" as="geometry" />
-        </mxCell>
-        <mxCell id="REC04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-04&#xa;Reasignacion Automatica&#xa;(sistema)" vertex="1">
-          <mxGeometry height="52" width="300" x="880" y="210" as="geometry" />
         </mxCell>
         <mxCell id="REC05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-05&#xa;Consultar Turno" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="270" as="geometry" />
@@ -43,9 +40,6 @@
         <mxCell id="REC13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-13&#xa;Consultar Indicaciones Medicas" vertex="1">
           <mxGeometry height="52" width="300" x="880" y="450" as="geometry" />
         </mxCell>
-        <mxCell id="REC14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-14&#xa;Cancelar Turno por Vencimiento&#xa;(sistema)" vertex="1">
-          <mxGeometry height="52" width="300" x="540" y="510" as="geometry" />
-        </mxCell>
         <mxCell id="REC15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-15&#xa;Registrar Asistencia a Turno" vertex="1">
           <mxGeometry height="52" width="300" x="880" y="510" as="geometry" />
         </mxCell>
@@ -69,9 +63,6 @@
         </mxCell>
         <mxCell id="REC22" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="UC-REC-22&#xa;Reprogramar Turno Manualmente" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="750" as="geometry" />
-        </mxCell>
-        <mxCell id="REC_S1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-S-01&lt;br&gt;Buscar Paciente&lt;br&gt;(sistema)" vertex="1">
-          <mxGeometry height="52" width="300" x="880" y="750" as="geometry" />
         </mxCell>
         <mxCell id="GRP_DIAG" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;dashed=1;verticalAlign=top;verticalLabelPosition=top;align=center;spacing=1;fontSize=13;" value="" vertex="1">
           <mxGeometry height="370" width="760" x="510" y="960" as="geometry" />
@@ -165,6 +156,21 @@
         </mxCell>
         <mxCell id="REP01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="UC-REP-01&#xa;Consolidar y Exportar Datos Operativos" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="2350" as="geometry" />
+        </mxCell>
+        <mxCell id="GRP_SYS" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0fff0;strokeColor=#2d7600;dashed=1;verticalAlign=top;verticalLabelPosition=top;align=center;spacing=8;fontStyle=1;fontSize=13;" value="" vertex="1">
+          <mxGeometry height="320" width="360" x="1350" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SYS_TITLE" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;fontStyle=1;fontColor=#2d7600;" value="Módulo Conceptual:&lt;br&gt;Casos de Uso del Sistema" vertex="1">
+          <mxGeometry height="40" width="300" x="1380" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="REC04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-04&#xa;Reasignacion Automatica&#xa;(sistema)" vertex="1">
+          <mxGeometry height="52" width="300" x="1380" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="REC14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-14&#xa;Cancelar Turno por Vencimiento&#xa;(sistema)" vertex="1">
+          <mxGeometry height="52" width="300" x="1380" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="REC_S1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-REC-S-01&lt;br&gt;Buscar Paciente&lt;br&gt;(sistema)" vertex="1">
+          <mxGeometry height="52" width="300" x="1380" y="300" as="geometry" />
         </mxCell>
         <mxCell id="e_p1" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-1" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="REC01">
           <mxGeometry relative="1" as="geometry">
@@ -560,6 +566,42 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="1145" as="sourcePoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="inc_rec02_rec04" edge="1" parent="1" source="REC02" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.25;startArrow=none;startFill=0;" target="REC04" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec03_rec04" edge="1" parent="1" source="REC03" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="REC04" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec15_rec04" edge="1" parent="1" source="REC15" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" target="REC04" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec21_rec04" edge="1" parent="1" source="REC21" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="REC04" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec22_rec04" edge="1" parent="1" source="REC22" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" target="REC04" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec17_recs1" edge="1" parent="1" source="REC17" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.25;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec19_recs1" edge="1" parent="1" source="REC19" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_diag08_recs1" edge="1" parent="1" source="DIAG08" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_diag01_recs1" edge="1" parent="1" source="DIAG01" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.1;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec20_recs1" edge="1" parent="1" source="REC20" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.35;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec21_recs1" edge="1" parent="1" source="REC21" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.65;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc_rec22_recs1" edge="1" parent="1" source="REC22" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.9;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5phSfRxYK-5CG3QK3BhO-1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#66B2FF;" value="Paciente (ACT-04)" vertex="1">
           <mxGeometry height="60" width="30" x="200" y="180" as="geometry" />
