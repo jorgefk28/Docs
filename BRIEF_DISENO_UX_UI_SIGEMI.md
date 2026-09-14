@@ -173,10 +173,11 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 ### Flujo complementario de mayor frecuencia — Gestión de turno (WhatsApp + agenda)
 **Actores:** Paciente (WhatsApp/Agente IA), Bioquímico/Admin (web).
 1. Paciente pide turno; el Agente IA pide DNI + nombre → **Alta Temprana**.
-2. IA consulta agenda, muestra bloques y los **bloquea 10 min**.
-3. Paciente elige → turno **Confirmado**; se envían indicaciones + recordatorio programado.
-4. En la consulta: Bioquímico localiza turno en agenda → "Registrar Asistencia" → **Atendido** / **No Asistió** (libera bloque y dispara UC-REC-04).
-5. **Edge cases:** DNI inválido (reingreso); timeout 10 min (libera); sin disponibilidad (ofrece alerta de cancelación); cancelación < 24 h (bloqueada para paciente); cancelación libera hueco → reasignación automática recursiva (mensaje nocturno 22:00–08:00 se difiere a 08:00; plazo de respuesta 2 h); turnos vencidos sin atender → job diario marca **No Asistió**.
+2. IA consulta la agenda y muestra los bloques disponibles **sin aplicar bloqueo temporal** sobre los horarios ofrecidos.
+3. Paciente elige → el sistema intenta reservar la franja. **Concurrencia:** si la franja ya fue ocupada por otro paciente entre la consulta y la confirmación, el Agente IA informa la no disponibilidad y **se reanuda el proceso de selección de agenda** mostrando la disponibilidad actualizada.
+4. Si la reserva tiene éxito → turno **Confirmado**; se envían indicaciones + recordatorio programado.
+5. En la consulta: Bioquímico localiza turno en agenda → "Registrar Asistencia" → **Atendido** / **No Asistió** (libera bloque y dispara UC-REC-04).
+6. **Edge cases:** DNI inválido (reingreso); franja ocupada en el momento de confirmar (el agente avisa y vuelve a mostrar agenda vigente); sin disponibilidad inicial (ofrece alerta de cancelación); cancelación < 24 h (bloqueada para paciente); cancelación libera hueco → reasignación automática recursiva (mensaje nocturno 22:00–08:00 se difiere a 08:00; plazo de respuesta 2 h); turnos vencidos sin atender → job diario marca **No Asistió**.
 
 ### 1. Flujo: Recepción de muestra
 **Actores:** Bioquímico/Doctor.
