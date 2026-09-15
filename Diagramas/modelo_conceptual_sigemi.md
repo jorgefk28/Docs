@@ -10,15 +10,19 @@
 | **Paciente** | Persona atendida en el laboratorio de Micología. Núcleo del historial clínico, creado incluso de forma temprana (alta con solo DNI y nombre). | Entidad transaccional |
 | **FichaClinica** | Documento clínico estructurado de una consulta presencial sujeto a versionado. Se genera por cada visita. | Entidad transaccional |
 | **VersionFichaClinica** | Historial inmutable de los cambios de una ficha; conserva el contenido previo y el nuevo ante cada modificación. | Entidad de auditoría clínica |
-| **Turno** | Cita programada para un paciente con ciclo de estados y control de reprogramaciones y cancelaciones. | Entidad transaccional |
+| **Turno** | Cita programada para un paciente, asignada a un **Profesional** (quién atiende) y a un **EspacioAtencion** (dónde atiende), con ciclo de estados y control de reprogramaciones y cancelaciones. | Entidad transaccional |
 | **IndicacionMedica** | Instrucción médica predefinida que se comunica al paciente al agendar, asociada a un tipo de análisis. | Catálogo funcional |
 | **ConfiguracionAgenda** | Parámetros que definen la disponibilidad horaria del laboratorio y las reglas de emisión de turnos. | Configuración del sistema |
 | **PeriodoInhabilitado** | Cierre **global** de agenda por rango de fecha/franja. Reemplaza el texto `periodos_inhabiles` de la ConfiguracionAgenda: permite cerrar todo el laboratorio con un solo registro. | Entidad transaccional |
-| **Recurso** | Lugar físico u operativo de la agenda (sala, consultorio, laboratorio). Permite bloquear de forma puntual sin instanciar por médico. | Catálogo de recursos |
-| **GrupoRecurso** | Agrupación de recursos (ej. «Laboratorios de Micología») para aplicar bloqueos y configuraciones de una sola vez. | Catálogo de agrupación |
-| **BloqueoAgenda** | Restricción puntual (día completo o franja) que impide asignar turnos a un **Recurso** o **GrupoRecurso** específico. Incluye precedencia frente a solapamientos. | Entidad transaccional |
+| **Profesional** | Médico o bioquímico con matrícula que atiende pacientes, posee una agenda de disponibilidad propia y genera los registros clínicos. Se corresponde 1:1 con un **Usuario** de rol Bioquímico-Doctor. | Entidad de personal |
+| **EspacioAtencion** | Lugar físico de atención (Laboratorio / Consultorio) con regla de capacidad paralela: en un laboratorio pueden operar varios bioquímicos a la vez; en un consultorio, un solo médico en cada turno. Reemplaza a **Recurso**. | Catálogo de espacios |
+| **GrupoEspacio** | Agrupación de espacios de atención (ej. «Laboratorios») para aplicar bloqueos y configuraciones de una sola vez. Reemplaza a **GrupoRecurso**. | Catálogo de agrupación |
+| **DisponibilidadProfesional** | Patrón semanal de disponibilidad horaria de un **Profesional**, complementario del horario general del laboratorio. | Configuración del sistema |
+| **AusenciaProfesional** | Cierre individual de la agenda de un **Profesional** por rango de fecha/franja (licencia, vacaciones); al registrarse gatilla la reprogramación de sus turnos. | Entidad transaccional |
+| **BloqueoAgenda** | Restricción puntual (día completo o franja) que impide asignar turnos a un **EspacioAtencion** o **GrupoEspacio** específico. Incluye precedencia frente a solapamientos. | Entidad transaccional |
 | **TipoBloqueo** | Catálogo que clasifica el alcance de un bloqueo: Día Completo / Franja Horaria. | Catálogo funcional |
-| **AnalisisMicologico** | Trazado del ciclo completo de una muestra, desde el ingreso hasta la validación o cancelación. | Entidad transaccional central del diagnóstico |
+| **AnalisisMicologico** | Trazado del ciclo completo de una muestra, desde el ingreso hasta la validación o cancelación, con responsable, transiciones y validador trazados. | Entidad transaccional central del diagnóstico |
+| **TrazabilidadAnalisis** | Historial inmutable de cada transición de estado de un análisis (Pendiente → En Proceso → Terminado → Validado) con profesional actuante y timestamp. | Entidad de auditoría de laboratorio |
 | **TipoAnalisis** | Catálogo de análisis micológicos y tipos de muestra ofrecidos. | Catálogo funcional |
 | **Otp** | Token de un solo uso generado al validar el análisis, clave para la descarga segura del informe. | Entidad transaccional de seguridad |
 | **InformeResultados** | Documento PDF compilado al validar un análisis; disponible para el paciente mediante OTP. | Artefacto generado |
@@ -74,6 +78,7 @@
 | Turno | motivo_cancelacion | Motivo de cancelación (si aplica) |
 | Turno | fecha_creacion | Fecha de creación del turno |
 | Turno | fecha_atencion | Fecha/hora real de atención (si asistió) |
+| Turno | motivo_reprogramacion | Causa de la última reprogramación (paciente, ausencia del profesional, bloqueo de espacio, sistema) |
 | IndicacionMedica | titulo | Título de la indicación |
 | IndicacionMedica | contenido | Cuerpo de la indicación (texto libre) |
 | IndicacionMedica | estado | Activo / Inactivo (baja lógica) |
@@ -93,22 +98,39 @@
 | PeriodoInhabilitado | motivo | Razón del cierre (mantenimiento, feriado) |
 | PeriodoInhabilitado | recurrencia | Patrón recurrente opcional (ej. semanal) |
 | PeriodoInhabilitado | estado | Activo / Inactivo |
-| Recurso | nombre | Nombre del recurso (ej. «Sala 3», «Laboratorio B») |
-| Recurso | tipo_recurso | Sala / Consultorio / Laboratorio |
-| Recurso | descripcion | Detalle del recurso |
-| Recurso | estado | Activo / Inactivo |
-| GrupoRecurso | nombre | Nombre del grupo (ej. «Laboratorios de Micología») |
-| GrupoRecurso | descripcion | Detalle del grupo |
+| Profesional | matricula | N.° de matrícula profesional |
+| Profesional | especialidad | Especialidad (micología) |
+| Profesional | estado | Activo / Inactivo |
+| EspacioAtencion | nombre | Nombre del espacio (ej. «Laboratorio A», «Consultorio 1») |
+| EspacioAtencion | tipo_espacio | Laboratorio / Consultorio |
+| EspacioAtencion | capacidad_paralela | N.° de atenciones simultáneas (Consultorio = 1; Laboratorio = N) |
+| EspacioAtencion | descripcion | Detalle del espacio |
+| EspacioAtencion | estado | Activo / Inactivo |
+| GrupoEspacio | nombre | Nombre del grupo (ej. «Laboratorios de Micología») |
+| GrupoEspacio | descripcion | Detalle del grupo |
+| DisponibilidadProfesional | dia_semana | Día de la semana |
+| DisponibilidadProfesional | franja_manana | Horario matutino (inicio y fin) |
+| DisponibilidadProfesional | franja_tarde | Horario vespertino (inicio y fin) |
+| DisponibilidadProfesional | max_turnos_por_franja | Máximo de turnos por bloque |
+| DisponibilidadProfesional | estado | Activo / Inactivo |
+| AusenciaProfesional | fecha_inicio | Inicio de la ausencia |
+| AusenciaProfesional | fecha_fin | Fin de la ausencia |
+| AusenciaProfesional | hora_inicio | Inicio de franja (nulo si día completo) |
+| AusenciaProfesional | hora_fin | Fin de franja (nulo si día completo) |
+| AusenciaProfesional | motivo | Licencia / Vacaciones / Otro |
+| AusenciaProfesional | reprogramacion_aplicada | Indica si los turnos del período fueron reprogramados |
+| AusenciaProfesional | estado | Activo / Inactivo |
 | BloqueoAgenda | fecha_inicio | Inicio del período bloqueado |
 | BloqueoAgenda | fecha_fin | Fin del período (mismo día si es día único) |
 | BloqueoAgenda | hora_inicio | Inicio de la franja bloqueada (nulo si día completo) |
 | BloqueoAgenda | hora_fin | Fin de la franja bloqueada (nulo si día completo) |
 | BloqueoAgenda | motivo | Razón del bloqueo |
-| BloqueoAgenda | precedencia | Quién gana ante solapamientos: Global > Grupo > Recurso |
+| BloqueoAgenda | precedencia | Quién gana ante solapamientos: Global > Grupo > Espacio > Profesional |
 | BloqueoAgenda | estado | Activo / Inactivo (desbloqueado) |
 | TipoBloqueo | nombre | Día Completo / Franja Horaria |
 | TipoBloqueo | descripcion | Detalle del tipo de bloqueo |
 | AnalisisMicologico | tipo_muestra | Tipo de muestra biológica |
+| AnalisisMicologico | profesional_responsable | Bioquímico que realiza el análisis |
 | AnalisisMicologico | estado | Pendiente / En Proceso / Terminado / Validado / Cancelado / Derivado |
 | AnalisisMicologico | fecha_creacion | Fecha de ingreso de la muestra |
 | AnalisisMicologico | fecha_validacion | Fecha de validación final |
@@ -201,6 +223,10 @@
 | HallazgoAnalisis | tipo_hallazgo | Observación / Resultado |
 | HallazgoAnalisis | dato | Contenido del hallazgo |
 | HallazgoAnalisis | fecha | Fecha del hallazgo |
+| TrazabilidadAnalisis | estado_anterior | Estado previo del análisis |
+| TrazabilidadAnalisis | estado_nuevo | Estado posterior (Pendiente → En Proceso → Terminado → Validado) |
+| TrazabilidadAnalisis | fecha | Fecha/hora de la transición |
+| TrazabilidadAnalisis | observacion | Comentario del profesional |
 | CambioAuditoria | campo | Campo modificado |
 | CambioAuditoria | valor_anterior | Valor previo al cambio |
 | CambioAuditoria | valor_nuevo | Valor posterior al cambio |
@@ -218,29 +244,38 @@
 | Paciente | Es desactivado por | Usuario | Un usuario autorizado ejecuta la baja lógica del paciente. |
 | FichaClinica | Origina | AnalisisMicologico | Una ficha da origen a los análisis de la muestra recolectada. |
 | FichaClinica | Mantiene historial en | VersionFichaClinica | Cada modificación preserva una versión previa. |
-| FichaClinica | Es registrada por | Usuario | El bioquímico/doctor completa y registra la ficha. |
+| FichaClinica | Es registrada por | Profesional | El profesional que atiende la consulta completa y registra la ficha. |
 | FichaClinica | Detalla en | DatoClinico | La información clínica se descompone en campos estructurados. |
 | VersionFichaClinica | Versiona | FichaClinica | La versión referencia la ficha a la que pertenece. |
 | VersionFichaClinica | Es generada por | Usuario | El usuario que modifica queda como autor de la versión. |
 | Turno | Pertenece a | Paciente | El turno está asignado a un paciente. |
 | Turno | Se agenda para | TipoAnalisis | Se agenda para un tipo de análisis específico. |
 | Turno | Incluye | IndicacionMedica | Al agendar se envía la indicación médica asociada. |
-| Turno | Se asigna a | Recurso | El turno ocupa un recurso físico (sala, laboratorio). |
+| Turno | Se asigna a | EspacioAtencion | El turno ocupa un espacio físico (consultorio, laboratorio). |
+| Turno | Es atendido por | Profesional | El turno queda a cargo de un profesional (quién atiende). |
+| Profesional | Se corresponde con | Usuario | El profesional es el usuario con rol Bioquímico-Doctor. |
+| Profesional | Atiende | Turno | Un profesional atiende los turnos asignados a su agenda. |
+| Profesional | Posee | DisponibilidadProfesional | Cada profesional define su patrón semanal de disponibilidad. |
+| Profesional | Sufre | AusenciaProfesional | La ausencia cierra la agenda individual del profesional. |
+| AusenciaProfesional | Reprograma | Turno | Al registrarse se reprograman los turnos del período (prioridad: el mismo profesional). |
+| AusenciaProfesional | Es registrada por | Usuario | El administrador carga la ausencia del profesional. |
 | IndicacionMedica | Se asocia a | TipoAnalisis | La indicación pertenece a un tipo de análisis. |
 | ConfiguracionAgenda | Declara cierres en | PeriodoInhabilitado | Los períodos de cierre global reemplazan al texto `periodos_inhabiles`. |
 | PeriodoInhabilitado | Usa | TipoBloqueo | El cierre se clasifica como día completo o franja. |
 | BloqueoAgenda | Usa | TipoBloqueo | El bloqueo se clasifica como día completo o franja. |
-| BloqueoAgenda | Bloquea a | Recurso | Bloqueo puntual sobre un recurso específico. |
-| BloqueoAgenda | Aplica a | GrupoRecurso | Bloqueo que alcanza a todos los recursos del grupo. |
+| BloqueoAgenda | Bloquea a | EspacioAtencion | Bloqueo puntual sobre un espacio específico. |
+| BloqueoAgenda | Aplica a | GrupoEspacio | Bloqueo que alcanza a todos los espacios del grupo. |
 | BloqueoAgenda | Es ejecutado por | Usuario | El administrador crea el bloqueo. |
-| Recurso | Pertenece a | GrupoRecurso | Un recurso puede integrar uno o más grupos. |
+| EspacioAtencion | Pertenece a | GrupoEspacio | Un espacio puede integrar uno o más grupos. |
 | Equipo | Se clasifica en | TipoEquipo | El equipo pertenece a una categoría de equipos. |
 | Equipo | Se ubica en | UbicacionAlmacenamiento | Indica la ubicación física del equipo. |
 | Equipo | Recibe | MantenimientoEquipo | El equipo acumula un historial de mantenimientos. |
 | MantenimientoEquipo | Es ejecutado por | Usuario | El responsable registra la tarea de mantenimiento. |
 | AnalisisMicologico | Se origina en | FichaClinica | El análisis proviene de una ficha clínica. |
 | AnalisisMicologico | Es de tipo | TipoAnalisis | El análisis corresponde a un tipo del catálogo. |
-| AnalisisMicologico | Es validado por | Usuario | Un bioquímico valida el análisis. |
+| AnalisisMicologico | Es realizado por | Profesional | El bioquímico responsable procesa y ejecuta el análisis. |
+| AnalisisMicologico | Es validado por | Profesional | Un bioquímico valida el análisis. |
+| AnalisisMicologico | Registra transiciones en | TrazabilidadAnalisis | Cada cambio de estado queda historizado con actor y timestamp. |
 | AnalisisMicologico | Genera | Otp | Al validar se emite un token de descarga segura. |
 | AnalisisMicologico | Genera | InformeResultados | Al validar se compila el PDF del informe. |
 | AnalisisMicologico | Consume insumos en | MovimientoInventario | Los retiros de insumos se asocian al análisis. |
@@ -285,7 +320,7 @@ classDiagram
 
     FichaClinica --> AnalisisMicologico : "Origina"
     FichaClinica --> VersionFichaClinica : "Mantiene historial en"
-    FichaClinica --> Usuario : "Es registrada por"
+    FichaClinica --> Profesional : "Es registrada por"
     FichaClinica --> DatoClinico : "Detalla en"
 
     VersionFichaClinica --> FichaClinica : "Versiona"
@@ -294,7 +329,14 @@ classDiagram
     Turno --> Paciente : "Pertenece a"
     Turno --> TipoAnalisis : "Se agenda para"
     Turno --> IndicacionMedica : "Incluye"
-    Turno --> Recurso : "Se asigna a"
+    Turno --> EspacioAtencion : "Se asigna a"
+    Turno --> Profesional : "Es atendido por"
+
+    Profesional --> Usuario : "Se corresponde con"
+    Profesional --> DisponibilidadProfesional : "Posee"
+    AusenciaProfesional --> Profesional : "Afecta a"
+    AusenciaProfesional --> Turno : "Reprograma"
+    AusenciaProfesional --> Usuario : "Es registrada por"
 
     IndicacionMedica --> TipoAnalisis : "Se asocia a"
 
@@ -302,15 +344,17 @@ classDiagram
     PeriodoInhabilitado --> TipoBloqueo : "Usa"
 
     BloqueoAgenda --> TipoBloqueo : "Usa"
-    BloqueoAgenda --> Recurso : "Bloquea a"
-    BloqueoAgenda --> GrupoRecurso : "Aplica a"
+    BloqueoAgenda --> EspacioAtencion : "Bloquea a"
+    BloqueoAgenda --> GrupoEspacio : "Aplica a"
     BloqueoAgenda --> Usuario : "Es ejecutado por"
 
-    Recurso --> GrupoRecurso : "Pertenece a"
+    EspacioAtencion --> GrupoEspacio : "Pertenece a"
 
     AnalisisMicologico --> FichaClinica : "Se origina en"
     AnalisisMicologico --> TipoAnalisis : "Es de tipo"
-    AnalisisMicologico --> Usuario : "Es validado por"
+    AnalisisMicologico --> Profesional : "Es realizado por"
+    AnalisisMicologico --> Profesional : "Es validado por"
+    AnalisisMicologico --> TrazabilidadAnalisis : "Registra transiciones en"
     AnalisisMicologico --> Otp : "Genera"
     AnalisisMicologico --> InformeResultados : "Genera"
     AnalisisMicologico --> MovimientoInventario : "Consume insumos en"
@@ -396,6 +440,7 @@ classDiagram
         estado
         reprogramaciones
         motivo_cancelacion
+        motivo_reprogramacion
         fecha_creacion
         fecha_atencion
     }
@@ -428,16 +473,41 @@ classDiagram
         estado
     }
 
-    class Recurso {
+    class Profesional {
+        matricula
+        especialidad
+        estado
+    }
+
+    class EspacioAtencion {
         nombre
-        tipo_recurso
+        tipo_espacio
+        capacidad_paralela
         descripcion
         estado
     }
 
-    class GrupoRecurso {
+    class GrupoEspacio {
         nombre
         descripcion
+    }
+
+    class DisponibilidadProfesional {
+        dia_semana
+        franja_manana
+        franja_tarde
+        max_turnos_por_franja
+        estado
+    }
+
+    class AusenciaProfesional {
+        fecha_inicio
+        fecha_fin
+        hora_inicio
+        hora_fin
+        motivo
+        reprogramacion_aplicada
+        estado
     }
 
     class BloqueoAgenda {
@@ -467,6 +537,13 @@ classDiagram
         tipo_hallazgo
         dato
         fecha
+    }
+
+    class TrazabilidadAnalisis {
+        estado_anterior
+        estado_nuevo
+        fecha
+        observacion
     }
 
     class TipoAnalisis {
@@ -624,8 +701,9 @@ classDiagram
 - **Conversión de atributos `text` estructurado a tablas de detalle**: `datos_clinicos`, `periodos_inhabiles`, `observaciones`/`resultado_final`, `cambio_realizado` e `instrucciones_almacenamiento` pasaron a ser tablas con campos explícitos (`DatoClinico`, `PeriodoInhabilitado`, `HallazgoAnalisis`, `CambioAuditoria`, `InstruccionAlmacenamiento`). Los `text` descriptivos cortos (`descripcion`, `contenido`, `datos_previos`/`datos_nuevos` como snapshot inmutable) se mantienen como atributos libres por no tener sub-estructura.
 - **`TipoAnalisis.indicaciones_asociadas` se eliminó** por ser redundante con la relación existente `IndicacionMedica → TipoAnalisis`.
 - **Nueva tabla `TipoBloqueo`**: catálogo que clasifica todo bloqueo (Día Completo / Franja Horaria), utilizado tanto por `PeriodoInhabilitado` (global) como por `BloqueoAgenda` (puntual).
-- **Bloqueo de agenda — enfoque híbrido (Opción 3 elegida)**: se separan dos conceptos. (1) `PeriodoInhabilitado` para cierres **globales** (mantenimiento masivo, feriado): un solo registro cierra todo el laboratorio, eliminando la necesidad de instanciar `BloqueoAgenda` una vez por médico/sala. (2) `BloqueoAgenda` para bloqueos **puntuales** contra `Recurso` o `GrupoRecurso`. El campo `precedencia` (Global > Grupo > Recurso) resuelve solapamientos de forma determinística. «Cerrar los 50 laboratorios» = **1** registro, no 50.
-- **`Recurso` / `GrupoRecurso`**: la noción de recurso habilita bloqueos selectivos y la asignación de turnos a salas/laboratorios reales. **El bloqueo aplica exclusivamente a la agenda**: `Recurso` representa espacios de atención (sala, consultorio, laboratorio), no equipos.
+- **Bloqueo de agenda — enfoque híbrido (Opción 3 elegida)**: se separan dos conceptos. (1) `PeriodoInhabilitado` para cierres **globales** (mantenimiento masivo, feriado): un solo registro cierra todo el laboratorio, eliminando la necesidad de instanciar `BloqueoAgenda` una vez por espacio. (2) `BloqueoAgenda` para bloqueos **puntuales** contra `EspacioAtencion` o `GrupoEspacio`. El campo `precedencia` (Global > Grupo > Espacio > Profesional) resuelve solapamientos de forma determinística. «Cerrar los 50 laboratorios» = **1** registro, no 50.
+- **`Profesional` / `EspacioAtencion`**: la agenda se gestiona **por profesional** (`Profesional` con `DisponibilidadProfesional`), y el espacio físico (`EspacioAtencion`) define el «dónde» con una regla de concurrencia (`capacidad_paralela`): Laboratorio = N bioquímicos simultáneos; Consultorio = 1 médico. Sustituyen a `Recurso`/`GrupoRecurso`: el espacio no se bloquea por ocupación para alcanzar al profesional, y la ausencia individual (`AusenciaProfesional`, ej. licencia/vacaciones) cierra la agenda del profesional y dispara la **reprogramación automática** de sus turnos (prioridad: el mismo profesional; luego otro profesional del mismo análisis según política habilitada).
+- **Trazabilidad clínica**: `TrazabilidadAnalisis` historiza cada transición de estado del análisis (actor + timestamp); `Turno` y `FichaClinica` referencian al `Profesional` que atiende, cerrando la cadena *atiende → registra → realiza/actualiza → valida*.
 - **Equipos — modelo desacoplado (Alternativa 1 elegida)**: `Equipo`, `TipoEquipo` y `MantenimientoEquipo` son entidades independientes de `Insumo` y totalmente **desvinculadas de la lógica de bloqueo de agenda**. `Lote`, `stock_actual` y `fecha_vencimiento` (propios de consumibles) no contaminan al equipo, que incorpora serie, garantía y mantenimiento.
 - Las relaciones se presentan **sin cardinalidad**; los contratos exponen solo **atributos de negocio**, omitiendo identificadores, claves foráneas y tipos de dato técnicos (ver `modelo_dominio_sigemi.md` para el detalle físico).
 - **Paciente** no es un usuario del sistema (ACT-04): accede de forma anónima vía WhatsApp y portal OTP.

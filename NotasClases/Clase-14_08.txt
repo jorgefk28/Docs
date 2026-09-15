@@ -27,3 +27,18 @@ Miercoles 09/09 Clase virtual.
 Revisar factibilidad economica de Agente IA Whatsapp. 
 
 La nota se utiliza para presionar cuando uno no presenta avances o no llega con el proyecto.
+
+Clase 02/09
+Agregar caso de uso: 
+* Aplicar filtro de búsqueda <Include>
+* 
+
+indicar vigencia de horaris en ConfiguracionAgenda
+UCE-REC-01 
+permitir condición de carrera, no aplicar bloqueo temporal.
+
+Contemplar ingrso de muestras erróneos
+
+validar responsabilidades de bioquímico y doctor
+
+justificar json, evaluar tablas
