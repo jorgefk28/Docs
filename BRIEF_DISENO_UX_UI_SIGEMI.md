@@ -96,6 +96,7 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 ├── Agenda y Turnos
 │   ├── Agenda (día / semana / mes)
 │   ├── Nuevo Turno (manual)
+│   ├── Detalle / Acciones de Turno
 │   └── Configuración
 │       ├── Parámetros de agenda
 │       ├── Bloqueos (día completo / franja; global / recurso / grupo)
@@ -103,12 +104,12 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 ├── Pacientes
 │   ├── Listado / Búsqueda (DNI, nombre, apellido, estado)
 │   ├── Nuevo / Editar Paciente
-│   └── Perfil de Paciente
-│       ├── Fichas clínicas (con versiones)
-│       └── Análisis asociados
+│   ├── Perfil de Paciente
+│   │   ├── Fichas clínicas (con versiones)
+│   │   └── Análisis asociados
+│   └── Nueva Consulta (Ficha Clínica)
 ├── Análisis
 │   ├── Panel de Análisis (worklist por estado)
-│   ├── Nueva Consulta (Ficha Clínica)
 │   ├── Ingreso de Muestra
 │   └── Detalle de Análisis (hallazgos, estados, validación)
 ├── Resultados
@@ -126,7 +127,12 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 │   ├── Historial de Residuos
 │   └── Reporte Mensual
 ├── Reportes y Estadísticas
+│   └── Reporte de Inventario
 ├── Equipos ⚠️ FALTA DEFINIR ALCANCE
+├── Catálogos (transversal)
+│   ├── Tipos de Análisis y Muestra
+│   ├── Insumos, Categorías y Ubicaciones
+│   └── Categorías de Residuos
 ├── Seguridad
 │   ├── Usuarios
 │   └── Roles y Permisos
@@ -222,58 +228,81 @@ SIGEMI (web interna — Bioquímico/Profesor/Admin)
 
 ## 5. Pantallas necesarias
 
-> Cada screen lista: objetivo · usuario principal · datos · acciones · estados especiales.
+> Cada screen lista: objetivo · usuario principal · datos · acciones · **flujo de trabajo** · estados especiales.
 
 ### Acceso y global
-- **Login** — Autenticar con correo institucional + contraseña. · Bioquímico/Profesor/Admin · Datos: correo, contraseña · Acciones: Ingresar, recuperar (⚠️ sin flujo definido) · Estados: error genérico "Credenciales inválidas", cuenta **Bloqueada Temporal** (indica tiempo restante, bloqueo a 5 fallos).
-- **Panel de Control (Dashboard)** — Resumen operativo + alertas de stock. · Todos · Datos: alertas de stock bajo y vencimientos próximos (RF-09), conteo de análisis por estado, turnos del día, residuos del mes ⚠️ (contenido exacto FALTA DEFINIR) · Acciones: navegar a módulos, atender alertas · Estados: sin alertas (vacío OK), loading.
-- **Auditoría** — Consultar log inmutable. · Admin · Datos: fecha/hora, IP, usuario, módulo, acción, entidad, valores previo/nuevo por campo · Acciones: filtrar (módulo, usuario, rango, entidad), exportar · Estados: empty "sin eventos en el rango".
+- **Login** — Autenticar con correo institucional + contraseña. · Bioquímico/Profesor/Admin · Datos: correo, contraseña · Acciones: Ingresar · **Flujo:** 1) ingresar credenciales → 2) validar estado de cuenta (Activo/Bloqueado Temporal/Inactivo) → 3) contrastar hash → 4) emitir JWT y redirigir al dashboard → 5) auditar login. Recuperación de contraseña: **solo vía reseteo por Administrador** desde el módulo Usuarios (despliegue local, sin flujo de email) · Estados: error genérico "Credenciales inválidas", cuenta **Bloqueada Temporal** (indica tiempo restante, bloqueo a 5 fallos, desbloqueo automático por tiempo).
+- **Panel de Control (Dashboard)** — Resumen operativo + alertas de stock. · Todos · Datos: alertas de stock bajo y vencimientos próximos (RF-09), conteo de análisis por estado, turnos del día, residuos del mes ⚠️ (contenido exacto FALTA DEFINIR — resolver §9 antes de fijar) · Acciones: navegar a módulos, atender alertas · **Flujo:** 1) cargar alertas operativas (stock/vencimientos/análisis a validar) → 2) navegar a la entidad desde la alerta → 3) estado vacío = sin alertas · Estados: sin alertas (vacío OK), loading.
+- **Auditoría** — Consultar log inmutable. · Admin · Datos: fecha/hora, IP, usuario, módulo, acción, entidad, valores previo/nuevo por campo · Acciones: filtrar (módulo, usuario, rango, entidad), exportar · **Flujo:** 1) aplicar filtros → 2) ver detalle de cambios por campo → 3) exportar (solo lectura, inmutable, no editable/borrable por ningún rol) · Estados: empty "sin eventos en el rango".
 
 ### Agenda y Turnos
-- **Agenda (día/semana/mes)** — Visualizar y gestionar grilla de turnos y bloqueos. · Bioquímico/Admin · Datos: franjas por Recurso (sala/consultorio/laboratorio), turno (hora, paciente, tipo de análisis, estado), bloqueos (NO DISPONIBLES) · Acciones: filtrar (DNI, estado), nuevo turno, marcar asistencia, cancelar/reprogramar, bloquear franja · Estados: día sin turnos, franja ocupada entre consulta y confirmación, vista < 2 s.
-- **Nuevo Turno** — Agendar manualmente. · Bioquímico/Admin · Datos: DNI paciente, fecha, horario disponible, tipo de análisis, (indicación automática) · Acciones: buscar paciente (si no existe → alta), confirmar, cancelar · Estados: DNI inexistente → extensión a alta; horario ya ocupado.
-- **Detalle/Acciones de Turno** — Marcar Presente/Ausente, cancelar, reprogramar. · Bioquímico/Admin · Datos: paciente, fecha/hora, análisis, recurso, contador de reprogramaciones, motivo · Acciones: Presente/Ausente (motivo opcional), Cancelar (confirmación; <24 h requiere confirmación explícita extra), Reprogramar (máx. 2; requiere aval del Admin en el 3.º) · Estados: ya marcado → acción bloqueada.
-- **Configuración de Agenda** — Definir días hábiles, franjas, duración, intervalo, máx. por franja. · Admin · Acciones: guardar (valida consistencia horaria) · Estados: error de validación (hora fin < inicio) sin persistir.
-- **Bloqueos de Agenda** — Bloquear/desbloquear día completo o franja (global / por recurso / por grupo). · Admin · Datos: período, tipo, motivo, alcance, precedencia · Estados: turnos activos en el rango → aviso y opción de cancelar/reprogramar antes de aplicar.
-- **Indicaciones Médicas** — CRUD de indicaciones por tipo de análisis. · Bioquímico/Admin · Datos: título, contenido, tipo de análisis (obligatorio), estado · Acciones: crear, modificar, eliminar (baja lógica con confirmación) · Estados: vacío → CTA "crear primera indicación".
+- **Agenda (día/semana/mes)** — Visualizar y gestionar grilla de turnos y bloqueos. · Bioquímico/Admin · Datos: franjas por Recurso (sala/consultorio/laboratorio), turno (hora, paciente, tipo de análisis, estado), bloqueos (NO DISPONIBLES) · Acciones: filtrar (DNI, estado), nuevo turno, marcar asistencia, cancelar/reprogramar, bloquear franja · **Flujo:** 1) abrir vista (día/semana/mes) → 2) filtrar por DNI/estado → 3) hacer clic en un bloque → 4) accionar (Presente/Ausente, cancelar, reprogramar, bloquear) → 5) refrescar grilla. Ofrecer también diálogo accesible (no solo drag & drop) · Estados: día sin turnos, franja ocupada entre consulta y confirmación, vista < 2 s.
+- **Nuevo Turno** — Agendar manualmente. · Bioquímico/Admin · Datos: DNI paciente, fecha, horario disponible, tipo de análisis, (indicación automática) · Acciones: buscar paciente (si no existe → alta), confirmar, cancelar · **Flujo:** 1) buscar paciente por DNI → 2) si no existe, disparar alta (REC-16) y volver → 3) seleccionar fecha/hora disponible y tipo de análisis → 4) confirmar (estado Confirmado) → 5) notificar WhatsApp + programar recordatorio → 6) auditar · Estados: DNI inexistente → extensión a alta; horario ya ocupado (re-consultar grilla).
+- **Detalle/Acciones de Turno** — Marcar Presente/Ausente, cancelar, reprogramar. · Bioquímico/Admin · Datos: paciente, fecha/hora, análisis, recurso, contador de reprogramaciones, motivo · Acciones: Presente/Ausente (motivo opcional), Cancelar (confirmación; <24 h requiere confirmación explícita extra), Reprogramar (máx. 2; requiere aval del Admin en el 3.º) · **Flujo:** 1) localizar turno → 2) Presente: si el paciente tiene demográficos incompletos (Alta Temprana), mostrar formulario ligero "Completar datos del paciente" → luego habilitar "Iniciar consulta" (DIAG-01); Ausente: pedir motivo opcional → liberar bloque + disparar REC-04 → 3) auditar · Estados: ya marcado → acción bloqueada.
+- **Configuración de Agenda** — Definir días hábiles, franjas, duración, intervalo, máx. por franja. · Admin · Acciones: guardar (valida consistencia horaria) · **Flujo:** 1) editar parámetros → 2) validar consistencia horaria (hora fin > inicio, duración ≤ franja) → 3) persistir → 4) auditar → 5) aplicar al cálculo de disponibilidad del Agente IA · Estados: error de validación (hora fin < inicio) sin persistir.
+- **Bloqueos de Agenda** — Bloquear/desbloquear día completo o franja (global / por recurso / por grupo). · Admin · Datos: período, tipo, motivo, alcance, precedencia · Acciones: bloquear, desbloquear, confirmar · **Flujo:** 1) seleccionar día/franja → 2) definir tipo (día completo/franja), alcance (global/recurso/grupo) y motivo → 3) validar turnos activos en el rango → 4) si hay afectados, cancelar/reprogramar antes de aplicar → 5) marcar NO DISPONIBLES → 6) auditar · Estados: turnos activos en el rango → aviso y opción de cancelar/reprogramar antes de aplicar.
+- **Indicaciones Médicas** — CRUD de indicaciones por tipo de análisis. · Bioquímico/Admin · Datos: título, contenido, tipo de análisis (obligatorio), estado · Acciones: crear, modificar, eliminar (baja lógica con confirmación) · **Flujo:** 1) listar → 2) crear (título/contenido/tipo) o editar → 3) validar campos obligatorios → 4) eliminar con confirmación (baja lógica → INACTIVA) → 5) auditar · Estados: vacío → CTA "crear primera indicación".
 
 ### Pacientes y Ficha Clínica
-- **Listado de Pacientes** — Buscar y paginar. · Bioquímico/Admin · Datos: n.º de registro, DNI, nombre, apellido, estado, edad calculada · Acciones: filtros (DNI exacto, nombre/apellido parcial, estado), nuevo, ver perfil · Estados: 0 resultados → "No se encontraron pacientes" + CTA crear; carga > 2 s.
-- **Perfil de Paciente** — Historial clínico acumulado. · Bioquímico/Admin · Datos: demográficos, fichas clínicas (con versión), análisis con estado, resultados · Acciones (solo lectura salvo edición/desactivación) · Estados: paciente Inactivo (banner), sin fichas aún.
-- **Registro/Edición de Paciente** — Datos demográficos. · Bioquímico/Admin/⚠️ recepción · Datos: los campos de §3 · Acciones: guardar, desactivar (con motivo obligatorio; bloqueado si hay turnos futuros vigentes) · Estados: DNI duplicado → muestra el existente y ofrece editar; fecha de nacimiento **no editable** si el paciente ya tiene análisis.
-- **Nueva Consulta (Ficha Clínica)** — Carga estructurada en la consulta. · Bioquímico · Datos: demográficos pre-cargados + campos clínicos (DatoClinico, dinámicos según tipo de dato) · Acciones: guardar ficha → habilita "Ingresar Muestra" · Estados: campos obligatorios vacíos, error 500 sin persistencia.
-- **Historial de Versiones de Ficha** — Ver diff previo/nuevo + motivo. · Bioquímico/Admin · Solo lectura.
+- **Listado de Pacientes** — Buscar y paginar. · Bioquímico/Admin · Datos: n.º de registro, DNI, nombre, apellido, estado, edad calculada · Acciones: filtros (DNI exacto, nombre/apellido parcial, estado), nuevo, ver perfil · **Flujo:** 1) aplicar filtros → 2) paginar → 3) seleccionar → perfil o nueva consulta · Estados: 0 resultados → "No se encontraron pacientes" + CTA crear; carga > 2 s.
+- **Perfil de Paciente** — Historial clínico acumulado. · Bioquímico/Admin · Datos: demográficos, fichas clínicas (con versión), análisis con estado, resultados · Acciones (solo lectura salvo edición/desactivación) · **Flujo:** 1) abrir perfil → 2) navegar por secciones (demográficos, fichas, análisis) → 3) acceder a detalle/versiones · Estados: paciente Inactivo (banner), sin fichas aún.
+- **Registro/Edición de Paciente** — Datos demográficos. · Bioquímico/Admin · Datos: los campos de §3 · Acciones: guardar, desactivar (con motivo obligatorio; bloqueado si hay turnos futuros vigentes) · **Flujo:** 1) nuevo o buscar existente → 2) cargar/editar → 3) validar DNI único y formato → 4) guardar (o desactivar: motivo obligatorio, verificar turnos futuros) → 5) auditar · Estados: DNI duplicado → muestra el existente y ofrece editar; fecha de nacimiento **no editable** si el paciente ya tiene análisis.
+- **Nueva Consulta (Ficha Clínica)** — Carga estructurada en la consulta. · Bioquímico · Datos: demográficos pre-cargados + campos clínicos (DatoClinico, dinámicos según tipo de dato) · Acciones: guardar ficha → habilita "Ingresar Muestra" · **Flujo:** 1) buscar paciente (pre-carga Alta Temprana) → 2) completar campos clínicos obligatorios → 3) validar inline → 4) Guardar Ficha (vincula a Paciente) → 5) habilita "Ingresar Muestra" (paso secuencial con DIAG-02). DNI inexistente → alta manual de emergencia; error 500 → sin persistencia parcial · Estados: campos obligatorios vacíos, error 500 sin persistencia.
+- **Historial de Versiones de Ficha** — Ver diff previo/nuevo + motivo. · Bioquímico/Admin · Solo lectura · **Flujo:** 1) abrir ficha → 2) seleccionar versión → 3) ver diff previo/nuevo + motivo (audit trail).
 
 ### Análisis
-- **Panel de Análisis (worklist)** — Volumen de trabajo del laboratorio. · Bioquímico (Admin) · Datos: tabla paginada: n.º/lote de análisis, paciente, tipo de muestra, tipo de análisis, estado (color), fecha de ingreso, bioquímico asignado, días en estado ⚠️ (FALTA DEFINIR si se muestra SLA) · Acciones: filtrar por estado/tipo/fecha/bioquímico, abrir detalle, avanzar estado, cancelar, validar · Estados: columnas por estado, vacío "no hay análisis en este filtro".
-- **Detalle de Análisis** — Ciclo de vida de la muestra. · Bioquímico · Datos: datos de muestra y ficha, hallazgos (Observación/Resultado) con fecha, línea de tiempo de estados, validador y fecha de validación, vínculos a movimientos de inventario y residuos · Acciones: agregar hallazgo, avanzar/cancelar/validar · Estados: deshabilitar acciones no permitidas según estado.
-- **Ingreso de Muestra** — Alta del análisis. · Bioquímico · Datos: tipo de muestra, tipo de análisis, observaciones iniciales · Acciones: registrar → Pendiente · Estados: paso bloqueado si no hay ficha guardada.
-- **Catálogo de Tipos de Análisis/Muestra** — CRUD admin. · Admin · Datos: nombre, descripción, estado · Acciones: crear, modificar, desactivar (baja lógica preserva históricos).
+- **Panel de Análisis (worklist)** — Volumen de trabajo del laboratorio. · Bioquímico (Admin) · Datos: tabla paginada: n.º/lote de análisis, paciente, tipo de muestra, tipo de análisis, estado (color), fecha de ingreso, bioquímico asignado, días en estado ⚠️ (FALTA DEFINIR si se muestra SLA) · Acciones: filtrar por estado/tipo/fecha/bioquímico, abrir detalle, avanzar estado, cancelar, validar · **Flujo:** 1) aplicar filtros → 2) abrir detalle → 3) ejecutar acción según estado (avanzar/cancelar/validar) · Estados: columnas por estado, vacío "no hay análisis en este filtro".
+- **Detalle de Análisis** — Ciclo de vida de la muestra. · Bioquímico · Datos: datos de muestra y ficha, hallazgos (Observación/Resultado) con fecha, línea de tiempo de estados, validador y fecha de validación, vínculos a movimientos de inventario y residuos · Acciones: agregar hallazgo, avanzar/cancelar/validar · **Flujo:** 1) cargar hallazgo (Observación/Resultado) → 2) avanzar estado (Pendiente→En Proceso→Terminado) → 3) Validar (solo si Terminado; confirmación reforzada con resumen del informe) o Cancelar (solo Pendiente/En Proceso, motivo obligatorio) → 4) auditar · Estados: deshabilitar acciones no permitidas según estado.
+- **Ingreso de Muestra** — Alta del análisis. · Bioquímico · Datos: tipo de muestra, tipo de análisis, observaciones iniciales · Acciones: registrar → Pendiente · **Flujo:** 1) (solo si hay ficha guardada en sesión) → 2) seleccionar tipo de muestra y tipo de análisis → 3) observaciones iniciales → 4) Registrar (crea Análisis en Pendiente, ligado a ficha) → 5) redirigir al panel · Estados: paso bloqueado si no hay ficha guardada.
+- **Catálogo de Tipos de Análisis/Muestra** — CRUD admin. · Admin · Datos: nombre, descripción, estado · Acciones: crear, modificar, desactivar (baja lógica preserva históricos) · **Flujo:** 1) listar → 2) crear/modificar → 3) desactivar con confirmación (no seleccionable en nuevos análisis; históricos preservados) · Estados: tipo inactivo no aparece en nuevos análisis.
 
 ### Resultados
-- **Informes Emitidos** — Estado de entrega. · Bioquímico/Admin ⚠️ (ver quién lo consulta) · Datos: informe (PDF, hash, fecha), OTP (estado: vigente/usado/expirado), paciente, fecha de expiración, confirmación de envío WhatsApp · Acciones: reenviar ⚠️ (no definido), ver registro de auditoría de descarga · Estados: OTP expirado → opción de regeneración ⚠️ (no definida en requisitos).
-- **Portal de Resultados (paciente, mobile-first)** — Descarga segura. · Paciente · Datos: campos de verificación (DNI + OTP) · Acciones: validar y descargar · Estados: OTP inválido, usado, expirado (TTL 7 d), éxito con descarga; sin datos clínicos en pantalla previa a validar · ⚠️ Doble verificación "DNI + OTP" exigida por RF-08 y presentación.
+- **Informes Emitidos** — Estado de entrega. · Bioquímico/Admin (el Profesor **no** consulta resultados clínicos) · Datos: informe (PDF, hash, fecha), OTP (estado: vigente/usado/expirado), paciente, fecha de expiración, confirmación de envío WhatsApp · Acciones: ver registro de auditoría de descarga, reenviar ⚠️ (no definido — resolver §9 #7) · **Flujo:** 1) listar por estado OTP → 2) ver auditoría de descarga por informe → 3) reenvío/regeneración ⚠️ pendiente de §9 · Estados: OTP expirado → opción de regeneración ⚠️ (no definida en requisitos).
+- **Portal de Resultados (paciente, mobile-first)** — Descarga segura. · Paciente · Datos: campos de verificación (DNI + OTP) · Acciones: validar y descargar · **Flujo:** 1) ingresar DNI + OTP (sin datos clínicos visibles previos) → 2) validar (vigencia TTL 7 días + no usado) → 3) descargar PDF → 4) invalidar OTP (1 solo uso) · Estados: OTP inválido, usado, expirado (TTL 7 d), éxito con descarga; sin datos clínicos en pantalla previa a validar · ⚠️ Doble verificación "DNI + OTP" exigida por RF-08 y presentación.
 
 ### Stock de Insumos
-- **Inventario** — Estado del stock. · Los 3 roles · Datos: insumo, categoría, ubicación, unidad (ml/g/unid.), stock actual vs. umbral, lote en uso, vencimiento más próximo · Acciones: filtros (nombre, categoría, próximos a vencer/agotar), abrir detalle, ingresar/retirar/devolver · Estados: alertas visuales por umbral y vencimiento; insumo inactivo.
-- **Ingreso de Insumos** — Alta de lote. · Admin · Datos: insumo, n.º lote, cantidad, fecha de vencimiento, ubicación · Acciones: guardar → incrementa stock, registra movimiento · Estados: validación de fecha vencimiento > hoy.
-- **Retiro de Insumos** — Consumo. · Profesor/Bioquímico/Admin · Datos: insumo, cantidad, lote (propuesto **FEFO**), destino (análisis o práctica educativa), ubicación · Acciones: confirmar, cancelar · Estados: stock insuficiente → bloqueo; alerta post-retiro si cae bajo umbral.
-- **Devolución de Insumos** — Reversión parcial/total. · Profesor/Bioquímico/Admin · Datos: retiro original (referencia), cantidad a devolver, estado del lote · Estados: lote vencido → "Vencido — no utilizable".
-- **Trazabilidad de Movimientos** — Historial cronológico. · 3 roles · Datos: fecha, tipo (Ingreso/Retiro/Devolución), usuario, cantidad, lote, análisis/práctica, ubicación · Acciones: filtros (insumo, tipo, rango, usuario), exportar · Estados: vacío por filtro.
-- **Catálogos de Inventario** — Categorías de insumo, ubicaciones, insumos (umbrales y días de alerta). · Admin.
+- **Inventario** — Estado del stock. · Los 3 roles · Datos: insumo, categoría, ubicación, unidad (ml/g/unid.), stock actual vs. umbral, lote en uso, vencimiento más próximo · Acciones: filtros (nombre, categoría, próximos a vencer/agotar), abrir detalle, ingresar/retirar/devolver · **Flujo:** 1) filtrar → 2) ver alertas (ámbar/rojo) → 3) abrir detalle → 4) ingreso/retiro/devolución (formularios laterales con lote FEFO sugerido) · Estados: alertas visuales por umbral y vencimiento; insumo inactivo.
+- **Ingreso de Insumos** — Alta de lote. · Admin · Datos: insumo, n.º lote, cantidad, fecha de vencimiento, ubicación · Acciones: guardar → incrementa stock, registra movimiento · **Flujo:** 1) seleccionar insumo → 2) lote/cantidad/vencimiento/ubicación → 3) validar fecha de vencimiento > hoy → 4) guardar (incrementa stock + movimiento Ingreso) · Estados: validación de fecha vencimiento > hoy.
+- **Retiro de Insumos** — Consumo. · Profesor/Bioquímico/Admin · Datos: insumo, cantidad, lote (propuesto **FEFO**), destino (análisis o práctica educativa), ubicación · Acciones: confirmar, cancelar · **Flujo:** 1) seleccionar insumo → 2) cantidad → 3) sistema propone lote FEFO (vto. más próximo) → 4) destino (análisis o práctica) → 5) confirmar (deduce stock; alerta si cae bajo umbral) · Estados: stock insuficiente → bloqueo; alerta post-retiro si cae bajo umbral.
+- **Devolución de Insumos** — Reversión parcial/total. · Profesor/Bioquímico/Admin · Datos: retiro original (referencia), cantidad a devolver, estado del lote · **Flujo:** 1) seleccionar retiro original → 2) cantidad a devolver (≤ retirado) → 3) si lote vencido → "Vencido — no utilizable" → 4) registrar (incrementa stock + movimiento Devolución) · Estados: lote vencido → "Vencido — no utilizable"; devolución > retiro rechazada.
+- **Trazabilidad de Movimientos** — Historial cronológico. · 3 roles · Datos: fecha, tipo (Ingreso/Retiro/Devolución), usuario, cantidad, lote, análisis/práctica, ubicación · Acciones: filtros (insumo, tipo, rango, usuario), exportar · **Flujo:** 1) filtrar → 2) ver cronología → 3) exportar (solo lectura) · Estados: vacío por filtro.
+- **Catálogos de Inventario** — Categorías de insumo, ubicaciones, insumos (umbrales y días de alerta). · Admin · **Flujo:** CRUD por catálogo (baja lógica; insumos desactivados no reciben ingresos/retiros, históricos preservados).
 
 ### Residuos
-- **Registro de Residuo** — Carga de volumen y peso exactos. · Profesor/Bioquímico/Admin · Datos: categoría (Clase I/II/III, con instrucciones de almacenamiento visibles), volumen (ml), peso (g), fecha/hora, análisis o práctica origen, descripción · Acciones: registrar, guardar borrador ⚠️ (no definido) · Estados: validación de valores numéricos > 0.
-- **Historial de Residuos** — Listado y corrección. · 3 roles · Datos: fecha, categoría, volumen, peso, usuario, estado de consolidación · Acciones: filtrar (fecha, categoría, usuario), editar **solo antes de consolidación en reporte mensual** · Estados: registro consolidado → solo lectura.
-- **Disposición Final** — Cierre del ciclo. · Admin/Bioquímico ⚠️ · Datos: responsable, fecha, método de tratamiento, residuos incluidos · Acciones: registrar disposición · Estados: sin residuos pendientes de disposición.
-- **Reporte Mensual de Residuos** — Documento normativo. · Admin · Datos: mes/año, consolidado por categoría (volumen/peso), generados vs. dispuestos · Acciones: generar PDF, descargar · Estados: mes vacío → aviso de "sin registros".
+- **Registro de Residuo** — Carga de volumen y peso exactos. · Profesor/Bioquímico/Admin · Datos: categoría (Clase I/II/III, con instrucciones de almacenamiento visibles), volumen (ml), peso (g), fecha/hora, análisis o práctica origen, descripción · Acciones: registrar · **Flujo:** 1) seleccionar categoría (ver instrucciones de almacenamiento) → 2) ingresar volumen y peso (> 0) → 3) origen (análisis o práctica) → 4) registrar + auditar · Estados: validación de valores numéricos > 0. (Guardar borrador ⚠️ no definido → se omite.)
+- **Historial de Residuos** — Listado y corrección. · 3 roles · Datos: fecha, categoría, volumen, peso, usuario, estado de consolidación · Acciones: filtrar (fecha, categoría, usuario), editar **solo antes de consolidación en reporte mensual** · **Flujo:** 1) filtrar → 2) si no consolidado: editar (autor o Admin) → 3) si consolidado: solo lectura + auditar modificación · Estados: registro consolidado → solo lectura.
+- **Disposición Final** — Cierre del ciclo. · Admin/Bioquímico · Datos: responsable, fecha, método de tratamiento, residuos incluidos · Acciones: registrar disposición · **Flujo:** 1) listar residuos pendientes de disposición → 2) seleccionar → 3) responsable/fecha/método → 4) registrar (cierra ciclo, RF-19) · Estados: sin residuos pendientes de disposición.
+- **Reporte Mensual de Residuos** — Documento normativo. · Admin · Datos: mes/año, consolidado por categoría (volumen/peso), generados vs. dispuestos · Acciones: generar PDF, descargar · **Flujo:** 1) seleccionar mes/año → 2) consolidar registros → 3) generar PDF → 4) descargar (consolida y cierra datos) · Estados: mes vacío → aviso de "sin registros".
+- **Catálogo de Categorías de Residuos** — Gestionar clases de peligrosidad. · Admin · Datos: nombre, clase de peligrosidad (I/II/III), descripción, instrucciones de almacenamiento (pasos secuenciales) · Acciones: crear, modificar, desactivar (baja lógica) · **Flujo:** 1) listar → 2) crear/modificar → 3) desactivar con confirmación (no seleccionable en nuevos registros; históricos preservados). Cubre UC-LAB-10 / RF-17 · Estados: categoría inactiva no seleccionable en nuevos registros.
 
 ### Reportes
-- **Reportes y Estadísticas** — Consolidación y exportación. · Bioquímico/Admin · Datos: selector tipo (Clínico/Inventario/Residuos), rango de fechas, previsualización en tabla · Acciones: generar previsualización, exportar CSV/XLSX/PDF · Estados: sin datos en el rango ("No existen registros transaccionales para los parámetros indicados"); **reporte clínico → anonimización estricta** (remoción de datos sensibles) antes de exportar.
+- **Reportes y Estadísticas** — Consolidación y exportación. · Bioquímico/Admin · Datos: selector tipo (Clínico/Inventario/Residuos), rango de fechas, previsualización en tabla · Acciones: generar previsualización, exportar CSV/XLSX/PDF · **Flujo:** 1) seleccionar tipo + rango → 2) generar previsualización → 3) si Clínico: anonimización estricta → 4) exportar. Incluye el Reporte de Inventario (UC-LAB-13) · Estados: sin datos en el rango ("No existen registros transaccionales para los parámetros indicados"); **reporte clínico → anonimización estricta** (remoción de datos sensibles) antes de exportar.
 
 ### Seguridad
-- **Usuarios** — CRUD de cuentas. · Admin · Datos: nombre, apellido, correo (login), rol, estado, intentos fallidos/bloqueo · Acciones: alta, edición, baja lógica, asignación de rol · Estados: cuenta bloqueada temporalmente.
-- **Roles y Permisos** — Ver/definir matrices por rol. · Admin · Datos: permisos por pantalla/acción según Rol (Administrador / Bioquímico-Doctor / Profesor).
+- **Usuarios** — CRUD de cuentas. · Admin · Datos: nombre, apellido, correo (login), rol, estado, intentos fallidos/bloqueo · Acciones: alta, edición, baja lógica, asignación de rol, reseteo de contraseña (recuperación de login) · **Flujo:** 1) listar → 2) alta/edición → 3) asignar rol (1 por usuario) → 4) baja lógica (motivo) → 5) resetear contraseña si el usuario la olvidó → 6) auditar · Estados: cuenta bloqueada temporalmente (desbloqueo automático por tiempo).
+- **Roles y Permisos** — Ver/definir matrices por rol. · Admin · Datos: permisos por pantalla/acción según Rol (Administrador / Bioquímico-Doctor / Profesor) · **Flujo:** 1) seleccionar rol → 2) ver/editar matriz de permisos por pantalla y acción → 3) guardar → 4) auditar. Base de partida en §5.1.
+
+### §5.1 Matriz de roles × pantallas
+> Supuestos por defecto (validar con §9 #11): el **Profesor** solo opera en Recursos de Laboratorio (inventario y residuos) y **no** accede a datos clínicos; el **Bioquímico** accede a todo el núcleo clínico + inventario + residuos + agenda; el **Admin** accede a todo + seguridad + catálogos + auditoría + configuración.
+
+| Pantalla | Bioquímico | Profesor | Admin |
+|---|---|---|---|
+| Login / Dashboard / Auditoría | Login, Dashboard | Login, Dashboard | Todo |
+| Agenda, Nuevo Turno, Detalle de Turno, Indicaciones | ✅ | — | ✅ |
+| Configuración de Agenda, Bloqueos | — | — | ✅ |
+| Pacientes (Listado/Perfil/Edición/Nueva Consulta/Versiones) | ✅ | — | ✅ |
+| Panel de Análisis, Detalle, Ingreso de Muestra, Catálogo Tipos | ✅ (Catálogo: —) | — | ✅ |
+| Resultados (Informes Emitidos) | ✅ | — | ✅ |
+| Inventario, Trazabilidad | ✅ | ✅ | ✅ |
+| Ingreso de Insumos, Catálogos de Inventario | — | — | ✅ |
+| Retiro / Devolución de Insumos | ✅ | ✅ | ✅ |
+| Registro / Historial de Residuos | ✅ | ✅ | ✅ |
+| Catálogo de Categorías de Residuos | — | — | ✅ |
+| Disposición Final | ✅ | — | ✅ |
+| Reporte Mensual de Residuos | — | — | ✅ |
+| Reportes y Estadísticas | ✅ | — | ✅ |
+| Usuarios, Roles y Permisos | — | — | ✅ |
+| Portal de Resultados (paciente) | externo | externo | externo |
 
 ### ⚠️ FALTA DEFINIR
 - **Equipos** (activo fijo: microscopio, autoclave, centrífuga): listado, ficha (serie, marca, garantía, estado, requisitos de uso), mantenimientos preventivos/correctivos y próximo control — modelados en la BD pero **sin caso de uso** en requisitos. Confirmar si se diseña en esta iteración.
