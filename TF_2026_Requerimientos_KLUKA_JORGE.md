@@ -16,7 +16,7 @@ Realizado para: Módulo de Bioquímica y Farmacia UNaM
 | 5 | 25/05/2026 | Desarrollo de Casos de Uso Extendidos para Laboratorio Bioquímico.  | Kluka Jorge |
 | 6 | 30/05/2026 | Desarrollo de Casos de Uso Extendidos para Acceso, Seguridad y Reportes.  | Kluka Jorge |
 | 7 | 01/06/2026 | Desarrollo de Casos de Uso Extendidos para Recursos de Laboratorio y revisión.  | Kluka Jorge |
-| 8 |  |  | Kluka Jorge |
+| 8 | 04/10/2026 | Completitud de Casos de Uso Extendidos para Laboratorio Bioquímico (UCE–DIAG-03 a UCE–DIAG-10) y especificación del reenvío automático de OTP como postcondición.  | Kluka Jorge |
 | 9 |  |  | Kluka Jorge |
 | 10 |  |  | Kluka Jorge |
 | 11 |  |  | Kluka Jorge |
@@ -154,7 +154,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Datos específicos**| Nombre<br>Descripción<br>Indicaciones asociadas<br>Estado (Activo/Inactivo). |
 |  |  |
 |**Estabilidad**| Media |
-|**Comentarios**| Soporta UC–DIAG-11 (Gestionar Tipos de Análisis y Muestra). |
+|**Comentarios**| Soporta UC–DIAG-10 (Gestionar Tipos de Análisis y Muestra). |
 
 |**IRQ–06**|**Movimiento de Inventario**|
 |---|---|
@@ -216,7 +216,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**RF-07**|**Notificación de Disponibilidad de Resultados y OTP**|
 |---|---|
 |**Objetivos Asociados**| OBJ-03  |
-|**Descripción**| Una vez validado el análisis, el sistema debe notificar al paciente vía WhatsApp enviando un enlace al portal web seguro, las instrucciones de descarga y un token OTP generado criptográficamente. |
+|**Descripción**| Una vez validado el análisis, el sistema debe notificar al paciente vía WhatsApp enviando un enlace al portal web seguro, las instrucciones de descarga y un token OTP generado criptográficamente. Al expirar el TTL del OTP vigente (7 días) sin que el informe haya sido descargado, el sistema debe generar automáticamente un nuevo OTP (invalidando el anterior) y reenviar la notificación, repitiendo el ciclo hasta la descarga del informe. El reenvío manual queda disponible como mecanismo de respaldo ante fallas del proceso automático o solicitud del paciente. |
 |**Comentarios**| Asegura el cumplimiento de la Ley de Protección de los Datos Personales (Ley 25.326)  |
 
 |**RF-08**|**Validación de Identidad y Descarga de Informe**|
@@ -558,7 +558,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El Bioquímico/Doctor ingresa al sistema durante la consulta presencial para completar la información clínica estructurada del paciente, enlazándola con los datos demográficos previamente cargados por el Agente IA.  |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.<br>El paciente debe poseer un registro básico en el sistema (Alta Temprana).   |
 |**Postcondiciones**| Se genera y almacena la Ficha Clínica estructurada vinculada de forma unívoca al paciente. <br>El historial clínico queda disponible para la carga de futuros análisis micológicos.  |
-|**Comentarios**| Incluye `<<extend>>` a UC–DIAG-08 (Modificar Ficha Clínica). |
+|**Comentarios**| Incluye `<<extend>>` a UC–DIAG-07 (Modificar Ficha Clínica). |
 
 |**UC–DIAG-02**|**Registrar Ingreso de Muestra**|
 |---|---|
@@ -582,7 +582,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.<br>RF-08 Validación de Identidad y Descarga de Informe. |
 |**Descripción**| El Bioquímico da por concluido el estudio al emitir su diagnóstico final y aprobar los resultados mediante el sistema, cerrando así el ciclo clínico de la muestra.  |
 |**Precondición**| El Análisis Micológico debe encontrarse en estado "Terminado".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |
-|**Postcondiciones**| El estado del análisis cambia permanentemente a "Validado". <br>El sistema compila estáticamente los datos y genera de inmediato el Informe de Resultados en formato PDF, almacenándolo en el servidor seguro. <br>El sistema genera criptográficamente un Token OTP asociado al análisis y envía automáticamente un mensaje de WhatsApp al paciente con el enlace al portal web, las instrucciones y el Token OTP.  |
+|**Postcondiciones**| El estado del análisis cambia permanentemente a "Validado". <br>El sistema compila estáticamente los datos y genera de inmediato el Informe de Resultados en formato PDF, almacenándolo en el servidor seguro. <br>El sistema genera criptográficamente un Token OTP asociado al análisis y envía automáticamente un mensaje de WhatsApp al paciente con el enlace al portal web, las instrucciones y el Token OTP. <br>El sistema programa automáticamente el reenvío de un nuevo Token OTP al expirar el TTL del Token vigente (7 días, RNF-02) mientras el Informe no haya sido descargado, invalidando el Token anterior en cada ciclo. El reenvío automático es una postcondición del caso de uso; el reenvío manual queda como mecanismo de respaldo.  |
 
 |**UC–DIAG-05**|**Descargar Informe**|
 |---|---|
@@ -625,7 +625,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico asignado, sin necesidad de navegar paciente por paciente. |
 |**Precondición**| Sesión activa con rol autorizado. |
 |**Postcondiciones**| El sistema presenta una tabla paginada y filtrable de análisis. Operación de solo lectura. Desde este panel se puede acceder al detalle de cada análisis y ejecutar acciones (actualizar estado, validar, cancelar). |
-|**Comentarios**| Diferente de DIAG-07 (que muestra el historial de un paciente). Este UC muestra el volumen de trabajo del laboratorio. |
+|**Comentarios**| Diferente de DIAG-06 (que muestra el historial de un paciente). Este UC muestra el volumen de trabajo del laboratorio. |
 
 |**UC–DIAG-10**|**Gestionar Tipos de Análisis y Muestra**|
 |---|---|
@@ -1368,7 +1368,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 7 | Menos de 2 segundos  |
 |**Frecuencia**| Alta |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| El campo de "Edad" es calculado en tiempo real por el Backend a partir de la Fecha de Nacimiento, no se guarda estáticamente.  |  |
+|**Comentarios**| El campo de "Edad" es calculado en tiempo real por el sistema a partir de la Fecha de Nacimiento, no se guarda estáticamente.  |  |
 
 |**UCE–DIAG-02**|**Registrar Ingreso de Muestra**|  |
 |---|---|---|
@@ -1377,12 +1377,12 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El Bioquímico/Doctor registra en el sistema la recepción física de la muestra microbiológica del paciente, iniciando la trazabilidad.  |  |
 |**Precondición**| El paciente debe contar con una Ficha Clínica registrada en la sesión actual.<br>El usuario debe tener una sesión activa con el rol correspondiente. |  |
 |**Secuencia normal**|**Paso**|  |
-|  | 1 | El Bioquímico presiona el botón "Ingresar Muestra" habilitado al finalizar el UC-DIAG-01.  |
+|  | 1 | El Bioquímico presiona el botón "Ingresar Muestra" habilitado al finalizar el UC–DIAG-01.  |
 |  | 2 | La interfaz despliega el formulario de carga de parámetros iniciales.  |
 |  | 3 | El Bioquímico selecciona el "Tipo de Muestra" y completa observaciones iniciales.  |
 |  | 4 | El Bioquímico presiona "Registrar Muestra".  |
-|  | 5 | El Backend crea un nuevo registro en la tabla "Análisis Micológico" y establece su estado en "Pendiente".  |
-|  | 6 | El Backend enlaza la clave foránea de este registro con la Ficha Clínica del paciente.  |
+|  | 5 | El sistema crea un nuevo registro en la tabla "Análisis Micológico" y establece su estado en "Pendiente".  |
+|  | 6 | El sistema enlaza la clave foránea de este registro con la Ficha Clínica del paciente.  |
 |  | 7 | La interfaz confirma la operación y redirige al panel de control de muestras.  |
 |**Postcondición**| Se crea un registro de Análisis Micológico con estado inicial "Pendiente".  |  |
 |**Excepciones**|**Paso**|  |
@@ -1392,6 +1392,217 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Frecuencia**| Alta |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
+
+|**UCE–DIAG-03**|**Actualizar Estado de Análisis**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico  |  |
+|**Descripción**| El Bioquímico/Doctor carga los resultados parciales u observaciones obtenidos durante el procesamiento de la muestra y avanza el estado del estudio dentro del flujo de trabajo (Pendiente → En Proceso → Terminado).  |  |
+|**Precondición**| Debe existir un Análisis Micológico en estado "Pendiente" o "En Proceso".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Bioquímico ingresa al módulo de Análisis o accede desde el Panel de Análisis (UC–DIAG-09).  |
+|  | 2 | El sistema muestra el detalle del análisis con su estado actual.  |
+|  | 3 | El Bioquímico carga los parámetros, resultados parciales y observaciones.  |
+|  | 4 | El Bioquímico selecciona el nuevo estado del estudio (En Proceso o Terminado).  |
+|  | 5 | El sistema valida que la transición de estado sea la siguiente en el flujo (Pendiente → En Proceso → Terminado).  |
+|  | 6 | El sistema persiste los datos y actualiza el estado del análisis.  |
+|  | 7 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma la actualización y actualiza el panel.  |
+|**Postcondición**| Los parámetros, observaciones y resultados parciales quedan guardados en la base de datos. El estado del análisis avanza según la selección del usuario.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si la transición de estado no es válida (por ejemplo, intentar pasar de "Pendiente" directamente a "Terminado"), el sistema rechaza la operación y mantiene el estado actual.  |
+|  | 6 | Si el análisis se encuentra en estado "Cancelado" o "Validado", el sistema bloquea la actualización.  |
+|  | 6 | Si ocurre un error de conexión con la base de datos, el sistema aborta la transacción sin guardar datos parciales.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| El estado "Validado" solo se alcanza mediante UC–DIAG-04. Un análisis cancelado no puede reanudarse sin una nueva muestra.  |  |
+
+|**UCE–DIAG-04**|**Validar Análisis**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis.<br>OBJ-03 Emisión Segura y Descarga de Resultados  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.<br>RF-08 Validación de Identidad y Descarga de Informe.  |  |
+|**Descripción**| El Bioquímico da por concluido el estudio al emitir su diagnóstico final y aprobar los resultados mediante el sistema, cerrando el ciclo clínico de la muestra. El sistema genera el Informe PDF, el token OTP y notifica al paciente por WhatsApp.  |  |
+|**Precondición**| El Análisis Micológico debe encontrarse en estado "Terminado".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Bioquímico abre el análisis en estado "Terminado" desde el panel o el historial del paciente.  |
+|  | 2 | El sistema muestra los resultados completos y las observaciones cargadas.  |
+|  | 3 | El Bioquímico emite el diagnóstico final.  |
+|  | 4 | El Bioquímico presiona "Validar Análisis".  |
+|  | 5 | El sistema valida que todos los campos requeridos del resultado estén completos.  |
+|  | 6 | El sistema cambia el estado a "Validado" y registra la fecha de validación y el bioquímico validador.  |
+|  | 7 | El sistema compila los datos y genera el Informe de Resultados en formato PDF, almacenándolo en el servidor seguro.  |
+|  | 8 | El sistema genera criptográficamente un token OTP (TTL de 7 días) asociado al informe.  |
+|  | 9 | El sistema envía un mensaje de WhatsApp al paciente con el enlace al portal, las instrucciones de descarga y el OTP.  |
+|  | 10 | El sistema programa automáticamente el proceso de reenvío de OTP: al expirar el TTL del OTP vigente sin que el informe haya sido descargado, genera un nuevo OTP, invalida el anterior y reenvía la notificación por WhatsApp. El ciclo se repite hasta la descarga del informe.  |
+|  | 11 | El sistema registra el evento en la tabla de auditoría.  |
+|**Postcondición**| El estado del análisis cambia permanentemente a "Validado". El Informe PDF queda generado y almacenado. El token OTP queda emitido y la notificación enviada al paciente. El sistema queda programado para reenviar automáticamente un nuevo OTP al expirar el TTL del vigente mientras el informe no sea descargado.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si faltan resultados o campos obligatorios, el sistema bloquea la validación e indica los campos pendientes.  |
+|  | 9 | Si falla el envío inicial de WhatsApp, el sistema conserva el PDF y el OTP, registra el fallo y encola el reintento automático.  |
+|  | 10 | Si el proceso automático de reenvío falla de forma reiterada o el paciente lo solicita (ej. extravío del mensaje o cambio de teléfono), el Bioquímico/Doctor o Administrador puede ejecutar un reenvío manual de la notificación con un nuevo OTP, que invalida el vigente. El reenvío manual es el mecanismo de respaldo ("por las dudas"), no el mecanismo principal.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 2 segundos.  |
+|  | 8 | Menos de 1 segundo.  |
+|  | 9 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Solo el rol Bioquímico/Doctor puede validar (control de calidad, RF-06). El OTP tiene un TTL de 7 días (RNF-02); el reenvío automático al expirar el TTL es una postcondición del caso de uso y no constituye un caso de uso independiente.  |  |
+
+|**UCE–DIAG-05**|**Descargar Informe**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-03 Emisión Segura y Descarga de Resultados  |  |
+|**Requisitos asociados**| RF-08 Validación de Identidad y Descarga de Informe.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.  |  |
+|**Descripción**| El Paciente, actuando de forma anónima desde el navegador, ingresa al portal web seguro del laboratorio e introduce el código OTP provisto por WhatsApp para acceder y descargar su Informe de Resultados en formato PDF.  |  |
+|**Precondición**| El sistema debe tener el PDF almacenado y un token OTP válido (no expirado ni usado) asociado a ese informe.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El paciente abre el enlace al portal web seguro desde el mensaje de WhatsApp.  |
+|  | 2 | El sistema muestra la pantalla de ingreso del código OTP (interfaz Mobile-First).  |
+|  | 3 | El paciente ingresa el código OTP.  |
+|  | 4 | El sistema valida el OTP: exactitud, vigencia (TTL de 7 días) y no utilización previa.  |
+|  | 5 | El sistema autoriza una sesión temporal de descarga.  |
+|  | 6 | El sistema muestra el informe de resultados disponible.  |
+|  | 7 | El paciente presiona "Descargar".  |
+|  | 8 | El sistema inicia la descarga segura del PDF en el dispositivo del paciente.  |
+|  | 9 | El sistema invalida el token OTP para prevenir usos múltiples.  |
+|**Postcondición**| El Informe de Resultados queda descargado en el dispositivo del paciente y el token OTP queda invalidado.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el OTP es incorrecto, el sistema muestra un error genérico y permite reingresar.  |
+|  | 4 | Si el OTP está vencido (superó los 7 días), el sistema informa la expiración y finaliza el flujo; el paciente recibirá un nuevo OTP mediante el reenvío automático programado en UC–DIAG-04 o, en su defecto, por el reenvío manual de respaldo del personal.  |
+|  | 4 | Si el OTP ya fue utilizado, el sistema rechaza el acceso.  |
+|  | 4 | Si se superan los intentos fallidos, el sistema bloquea temporalmente el acceso.  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 1 segundo.  |
+|  | 8 | Variable según el tamaño del archivo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| El paciente no posee cuenta ni credenciales del sistema interno (ACT-04). Diseño Mobile-First y responsivo (RNF-03). Cumple la Ley de Protección de los Datos Personales (Ley 25.326).  |  |
+
+|**UCE–DIAG-06**|**Consultar Historial de Paciente**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-05 Registro de Ficha Clínica  |  |
+|**Descripción**| El personal autorizado busca y visualiza el historial médico acumulado de un paciente, incluyendo sus fichas clínicas previas y el estado de sus análisis micológicos.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Pacientes.  |
+|  | 2 | El usuario busca al paciente por DNI, nombre o apellido.  |
+|  | 3 | El sistema retorna el perfil del paciente con sus datos demográficos.  |
+|  | 4 | El sistema despliega el listado de fichas clínicas previas ordenadas por fecha de ingreso.  |
+|  | 5 | El usuario selecciona una ficha para visualizar su detalle clínico.  |
+|  | 6 | El sistema muestra los análisis micológicos asociados con su estado actual.  |
+|  | 7 | Operación de solo lectura (no modifica datos).  |
+|**Postcondición**| El historial clínico completo del paciente es presentado al usuario.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si ningún paciente coincide con el criterio de búsqueda, el sistema informa "Paciente no encontrado".  |
+|  | 4 | Si el paciente no posee fichas clínicas registradas, el sistema lo indica y finaliza la consulta.  |
+|**Rendimiento**|**Paso**|  |
+|  | 3 | Menos de 1 segundo.  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Complementa a UC–DIAG-09 (Panel de Análisis): este UC consulta el historial de un paciente específico, mientras que el panel muestra el volumen de trabajo del laboratorio.  |  |
+
+|**UCE–DIAG-07**|**Modificar Ficha Clínica**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-20 Modificación de Ficha Clínica  |  |
+|**Descripción**| El Bioquímico/Doctor modifica una ficha clínica previamente registrada, corrigiendo errores o agregando información complementaria. El sistema mantiene un historial de versiones.  |  |
+|**Precondición**| La ficha clínica debe existir.<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario busca al paciente y accede a su ficha clínica.  |
+|  | 2 | El sistema presenta la ficha en modo edición.  |
+|  | 3 | El usuario modifica los campos clínicos o administrativos.  |
+|  | 4 | La interfaz valida campos obligatorios y formatos.  |
+|  | 5 | El usuario presiona "Guardar Cambios".  |
+|  | 6 | El sistema conserva la versión anterior y registra la nueva versión (audit trail de modificaciones).  |
+|  | 7 | El sistema actualiza la ficha vigente del paciente.  |
+|  | 8 | La interfaz confirma "Ficha actualizada exitosamente".  |
+|**Postcondición**| La ficha clínica queda actualizada, la versión histórica conservada y los cambios registrados en auditoría.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 1 | Si la ficha está asociada a un análisis en estado "Validado", el sistema restringe la edición a campos no clínicos (observaciones administrativas).  |
+|  | 7 | Si ocurre un error de conexión con la base de datos, el sistema aborta la transacción sin guardar cambios.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se invoca como `<<extend>>` de UC–DIAG-01 (Registrar Ficha Clínica). El versionado garantiza trazabilidad del historial clínico (RF-20).  |  |
+
+|**UCE–DIAG-08**|**Cancelar Análisis**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-21 Cancelación de Análisis.<br>RF-06 Actualización de Estados de Análisis Micológico.  |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador cancela un análisis micológico en curso, registrando obligatoriamente el motivo.  |  |
+|**Precondición**| El análisis debe existir y estar en estado "Pendiente" o "En Proceso".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario accede al detalle del análisis (desde el panel o el historial del paciente).  |
+|  | 2 | El sistema muestra el análisis con su estado actual.  |
+|  | 3 | El usuario presiona "Cancelar Análisis".  |
+|  | 4 | El sistema solicita el motivo obligatorio de cancelación.  |
+|  | 5 | El usuario ingresa el motivo.  |
+|  | 6 | El sistema valida que el estado del análisis permita la cancelación.  |
+|  | 7 | El sistema cambia el estado del análisis a "Cancelado".  |
+|  | 8 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 9 | La interfaz confirma la cancelación.  |
+|**Postcondición**| El estado del análisis cambia a "Cancelado", el motivo queda registrado y el análisis cancelado permanece en el historial del paciente.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 6 | Si el análisis está en estado "Validado", el sistema bloquea la cancelación: el análisis validado es definitivo.  |
+|  | 6 | Si el análisis ya está "Cancelado", el sistema informa y finaliza.  |
+|  | 5 | Si el motivo está vacío, el sistema bloquea el paso.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Una muestra contaminada, extraviada o un paciente que desiste justifican la cancelación (RF-21). Evita que análisis no viables continúen su procesamiento y libera recursos del laboratorio.  |  |
+
+|**UCE–DIAG-09**|**Consultar Panel de Análisis**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico  |  |
+|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico asignado, sin necesidad de navegar paciente por paciente.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al "Panel de Análisis" del módulo clínico.  |
+|  | 2 | El sistema lista todos los análisis de forma paginada.  |
+|  | 3 | El usuario aplica filtros (estado, tipo de análisis, rango de fechas, bioquímico).  |
+|  | 4 | El sistema filtra y actualiza el listado.  |
+|  | 5 | El usuario selecciona un análisis para ver su detalle.  |
+|  | 6 | El sistema muestra el detalle con las acciones habilitadas según el estado (actualizar, validar, cancelar).  |
+|**Postcondición**| El panel presenta el volumen de trabajo del laboratorio. Operación de solo lectura.  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si no hay análisis que cumplan los filtros, el sistema informa y muestra el listado vacío.  |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 2 segundos.  |
+|  | 4 | Menos de 1 segundo.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Diferente de UC–DIAG-06 (historial de un paciente); este UC muestra el volumen de trabajo del laboratorio. Las acciones de gestión disparan UC–DIAG-03, UC–DIAG-04 u UC–DIAG-08.  |  |
+
+|**UCE–DIAG-10**|**Gestionar Tipos de Análisis y Muestra**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-16 Gestión de Catálogos Clínicos.<br>IRQ-05 Catálogo de Tipos de Análisis/Muestra.  |  |
+|**Descripción**| El Administrador gestiona el catálogo de tipos de análisis micológicos y de tipos de muestra disponibles en el sistema (crear, modificar, desactivar).  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Catálogos Clínicos.  |
+|  | 2 | El sistema lista los tipos de análisis vigentes.  |
+|  | 3 | El usuario selecciona la operación: Crear, Modificar o Desactivar.  |
+|  | 4 | El usuario ingresa o actualiza los datos (nombre, descripción, indicaciones, estado).  |
+|  | 5 | El sistema valida la unicidad del nombre y la coherencia de los datos.  |
+|  | 6 | El sistema persiste el cambio y registra el evento en auditoría.  |
+|  | 7 | La interfaz confirma la operación.  |
+|**Postcondición**| El catálogo queda actualizado. Los tipos desactivados no pueden seleccionarse en nuevos análisis, pero se preservan en registros históricos.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si el nombre ya existe, el sistema rechaza la operación y solicita otro nombre.  |
+|  | 6 | Si se intenta desactivar un tipo con análisis históricos, el sistema aplica baja lógica conservando los registros.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| Incluye sub-flujos: Crear Tipo, Modificar Tipo, Desactivar Tipo (baja lógica). La relación entre tipo de análisis y tipos de muestra válidos alimenta los selectores de UC–DIAG-02.  |  |
 
 ### 2.8.3 Subsistema Recursos de Laboratorio
 

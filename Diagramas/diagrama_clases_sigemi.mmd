@@ -1,0 +1,524 @@
+classDiagram
+    direction TB
+
+    %% ===== PACIENTE / HISTORIAL =====
+    Paciente "1" --> "0..N" FichaClinica : "posee"
+    Paciente "1" --> "0..N" Turno : "reserva"
+    Paciente "N" --> "0..1" Usuario : "desactivado por"
+    Paciente "1" --> "0..N" OfertaReagendacion : "recibe ofertas"
+
+    FichaClinica "1" --> "0..N" VersionFichaClinica : "mantiene versiones"
+    FichaClinica "1" --> "0..N" DatoClinico : "contiene"
+    FichaClinica "N" --> "1" Profesional : "registrada por"
+    FichaClinica "1" --> "0..N" AnalisisMicologico : "origina"
+    VersionFichaClinica "N" --> "1" FichaClinica : "versiona"
+    VersionFichaClinica "N" --> "1" Usuario : "generada por"
+
+    %% ===== TURNO / AGENDA =====
+    Turno "N" --> "1" Paciente : "pertenece a"
+    Turno "N" --> "0..1" IndicacionMedica : "incluye"
+    Turno "N" --> "1" EspacioAtencion : "asignado a"
+    Turno "N" --> "1" Profesional : "atendido por"
+    Turno "N" --> "0..1" AnalisisMicologico : "deriva en"
+
+    IndicacionMedica "N" --> "1" TipoAnalisis : "asociada a"
+
+    %% ===== AGENDA / BLOQUEOS =====
+    ConfiguracionAgenda "1" --> "0..N" PeriodoInhabilitado : "declara"
+    PeriodoInhabilitado "N" --> "1" TipoBloqueo : "usa"
+    BloqueoAgenda "N" --> "1" TipoBloqueo : "usa"
+    BloqueoAgenda "N" --> "0..1" EspacioAtencion : "bloquea"
+    BloqueoAgenda "N" --> "0..1" GrupoEspacio : "aplica a"
+    BloqueoAgenda "N" --> "1" Usuario : "ejecutado por"
+
+    EspacioAtencion "N" --> "0..1" GrupoEspacio : "pertenece a"
+
+    %% ===== PROFESIONAL / DISPONIBILIDAD =====
+    Profesional "1" <--> "1" Usuario : "se corresponde"
+    Profesional "1" --> "0..N" DisponibilidadProfesional : "posee"
+    Profesional "1" --> "0..N" AusenciaProfesional : "sufre"
+    AusenciaProfesional "N" --> "1" Usuario : "registrada por"
+    AusenciaProfesional "1" --> "0..N" OfertaReagendacion : "dispara"
+
+    %% ===== ANALISIS MICOLOGICO =====
+    AnalisisMicologico "N" --> "1" FichaClinica : "se origina en"
+    AnalisisMicologico "N" --> "1" TipoAnalisis : "es de tipo"
+    AnalisisMicologico "N" --> "1" TipoMuestra : "es de muestra"
+    AnalisisMicologico "N" --> "1" Profesional : "realizado por"
+    AnalisisMicologico "N" --> "0..1" Profesional : "validado por"
+    AnalisisMicologico "1" --> "0..N" TrazabilidadAnalisis : "registra"
+    AnalisisMicologico "1" --> "0..1" Otp : "genera (vigente)"
+    AnalisisMicologico "1" --> "0..1" InformeResultados : "genera"
+    AnalisisMicologico "1" --> "0..N" HallazgoAnalisis : "contiene"
+    AnalisisMicologico "1" --> "0..N" MovimientoInventario : "consume"
+    AnalisisMicologico "1" --> "0..N" ResiduoQuimico : "produce"
+
+    TipoAnalisis "1" --> "0..N" TipoAnalisisTipoMuestra : "acepta"
+    TipoMuestra "1" --> "0..N" TipoAnalisisTipoMuestra : "aceptado en"
+
+    Otp "1" <--> "1" InformeResultados : "habilita descarga"
+
+    %% ===== INVENTARIO =====
+    Insumo "N" --> "1" CategoriaInsumo : "clasificado en"
+    Insumo "N" --> "1" UbicacionAlmacenamiento : "almacenado en"
+    Insumo "1" --> "0..N" Lote : "recibido en"
+    Lote "N" --> "1" Insumo : "pertenece a"
+    Lote "1" --> "0..N" MovimientoInventario : "registra"
+
+    MovimientoInventario "N" --> "1" Lote : "afecta a"
+    MovimientoInventario "N" --> "1" Usuario : "ejecutado por"
+    MovimientoInventario "N" --> "1" UbicacionAlmacenamiento : "retirado/ingresado en"
+    MovimientoInventario "N" --> "0..1" AnalisisMicologico : "asociado a"
+    MovimientoInventario "N" --> "0..1" MovimientoInventario : "revierte"
+
+    %% ===== RESIDUOS =====
+    ResiduoQuimico "N" --> "1" CategoriaResiduo : "pertenece a"
+    ResiduoQuimico "N" --> "1" Usuario : "registrado por"
+    ResiduoQuimico "N" --> "0..1" AnalisisMicologico : "proviene de"
+    ResiduoQuimico "N" --> "0..1" DisposicionFinal : "recibe"
+    ResiduoQuimico "N" --> "1" ReporteResiduos : "consolidado en"
+
+    CategoriaResiduo "1" --> "0..N" InstruccionAlmacenamiento : "define"
+    DisposicionFinal "N" --> "1" Usuario : "ejecutada por"
+
+    %% ===== EQUIPOS =====
+    Equipo "N" --> "1" TipoEquipo : "clasificado en"
+    Equipo "N" --> "1" UbicacionAlmacenamiento : "ubicado en"
+    Equipo "1" --> "0..N" MantenimientoEquipo : "recibe"
+    MantenimientoEquipo "N" --> "1" Usuario : "ejecutado por"
+
+    %% ===== SEGURIDAD / AUDITORIA =====
+    Usuario "N" --> "1" Rol : "posee"
+    Usuario "1" --> "0..N" Auditoria : "genera"
+    Auditoria "1" --> "0..N" CambioAuditoria : "contiene"
+    Usuario "1" --> "0..N" Reporte : "genera"
+    Usuario "1" --> "0..1" ConfiguracionAgenda : "configura"
+
+
+    %% ==================== CLASES ====================
+
+    class Paciente {
+        +integer id PK
+        +string numero_registro
+        +string dni
+        +string nombre
+        +string apellido
+        +date fecha_nacimiento
+        +string sexo
+        +string domicilio
+        +string telefono
+        +string correo_electronico
+        +string obra_social
+        +string nivel_registro
+        +string estado
+        +datetime fecha_ingreso
+    }
+
+    class FichaClinica {
+        +integer id PK
+        +integer paciente_id FK
+        +integer profesional_id FK
+        +datetime fecha_consulta
+        +integer version_actual
+        +string estado
+    }
+
+    class DatoClinico {
+        +integer id PK
+        +integer ficha_clinica_id FK
+        +string campo
+        +text valor
+        +string tipo_dato
+    }
+
+    class VersionFichaClinica {
+        +integer id PK
+        +integer ficha_clinica_id FK
+        +integer numero_version
+        +text datos_previos
+        +text datos_nuevos
+        +integer usuario_id FK
+        +datetime fecha_modificacion
+        +string motivo
+    }
+
+    class Turno {
+        +integer id PK
+        +integer paciente_id FK
+        +integer indicacion_medica_id FK
+        +integer profesional_id FK
+        +integer espacio_id FK
+        +datetime fecha_hora
+        +string telefono_contacto
+        +string estado
+        +integer reprogramaciones
+        +string motivo_cancelacion
+        +string motivo_reprogramacion
+        +datetime fecha_creacion
+        +datetime fecha_atencion
+    }
+
+    class IndicacionMedica {
+        +integer id PK
+        +string titulo
+        +text contenido
+        +integer tipo_analisis_id FK
+        +string estado
+        +datetime fecha_creacion
+        +datetime fecha_modificacion
+    }
+
+    class Profesional {
+        +integer id PK
+        +integer usuario_id FK
+        +string matricula
+        +string especialidad
+        +string estado
+    }
+
+    class ConfiguracionAgenda {
+        +integer id PK
+        +string dias_habiles
+        +time horario_inicio_manana
+        +time horario_fin_manana
+        +time horario_inicio_tarde
+        +time horario_fin_tarde
+        +integer duracion_turno
+        +integer intervalo_entre_turnos
+        +integer max_turnos_por_franja
+        +integer usuario_modificacion_id FK
+        +datetime fecha_modificacion
+    }
+
+    class PeriodoInhabilitado {
+        +integer id PK
+        +integer tipo_bloqueo_id FK
+        +integer usuario_id FK
+        +date fecha_inicio
+        +date fecha_fin
+        +time hora_inicio
+        +time hora_fin
+        +string motivo
+        +string recurrencia
+        +string estado
+    }
+
+    class BloqueoAgenda {
+        +integer id PK
+        +integer tipo_bloqueo_id FK
+        +integer espacio_id FK
+        +integer grupo_espacio_id FK
+        +integer usuario_id FK
+        +date fecha_inicio
+        +date fecha_fin
+        +time hora_inicio
+        +time hora_fin
+        +string motivo
+        +string estado
+    }
+
+    class TipoBloqueo {
+        +integer id PK
+        +string nombre
+        +text descripcion
+    }
+
+    class EspacioAtencion {
+        +integer id PK
+        +string nombre
+        +string tipo_espacio
+        +integer capacidad_paralela
+        +text descripcion
+        +string estado
+    }
+
+    class GrupoEspacio {
+        +integer id PK
+        +string nombre
+        +text descripcion
+    }
+
+    class DisponibilidadProfesional {
+        +integer id PK
+        +integer profesional_id FK
+        +string dia_semana
+        +time horario_inicio_manana
+        +time horario_fin_manana
+        +time horario_inicio_tarde
+        +time horario_fin_tarde
+        +integer max_turnos_por_franja
+        +string estado
+    }
+
+    class AusenciaProfesional {
+        +integer id PK
+        +integer profesional_id FK
+        +integer usuario_id FK
+        +date fecha_inicio
+        +date fecha_fin
+        +time hora_inicio
+        +time hora_fin
+        +string motivo
+        +boolean reprogramacion_aplicada
+        +string estado
+    }
+
+    class OfertaReagendacion {
+        +integer id PK
+        +integer turno_id FK
+        +integer paciente_ofertado_id FK
+        +datetime fecha_oferta
+        +datetime fecha_vencimiento
+        +string estado
+        +boolean pausa_nocturna
+    }
+
+    class AnalisisMicologico {
+        +integer id PK
+        +integer ficha_clinica_id FK
+        +integer tipo_analisis_id FK
+        +integer tipo_muestra_id FK
+        +integer profesional_responsable_id FK
+        +integer profesional_validador_id FK
+        +string estado
+        +datetime fecha_creacion
+        +datetime fecha_validacion
+        +string motivo_cancelacion
+    }
+
+    class TipoMuestra {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class TipoAnalisisTipoMuestra {
+        +integer id PK
+        +integer tipo_analisis_id FK
+        +integer tipo_muestra_id FK
+    }
+
+    class TipoAnalisis {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class HallazgoAnalisis {
+        +integer id PK
+        +integer analisis_id FK
+        +string tipo_hallazgo
+        +text dato
+        +string estado_alcanzado
+        +datetime fecha
+    }
+
+    class TrazabilidadAnalisis {
+        +integer id PK
+        +integer analisis_id FK
+        +integer profesional_id FK
+        +string estado_anterior
+        +string estado_nuevo
+        +datetime fecha
+        +text observacion
+    }
+
+    class Otp {
+        +integer id PK
+        +integer analisis_id FK
+        +string codigo
+        +datetime fecha_generacion
+        +datetime fecha_expiracion
+        +boolean usado
+        +datetime fecha_uso
+    }
+
+    class InformeResultados {
+        +integer id PK
+        +integer analisis_id FK
+        +string ruta_archivo
+        +datetime fecha_generacion
+        +string hash_archivo
+    }
+
+
+    class Insumo {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string unidad_medida
+        +integer categoria_id FK
+        +integer ubicacion_id FK
+        +real stock_actual
+        +real umbral_minimo
+        +integer dias_alerta_vencimiento
+        +string estado
+        +datetime fecha_creacion
+    }
+
+    class Lote {
+        +integer id PK
+        +integer insumo_id FK
+        +string numero_lote
+        +date fecha_ingreso
+        +date fecha_vencimiento
+        +real cantidad_inicial
+        +real cantidad_actual
+        +string estado
+    }
+
+    class MovimientoInventario {
+        +integer id PK
+        +integer lote_id FK
+        +integer usuario_id FK
+        +integer ubicacion_id FK
+        +integer analisis_id FK
+        +integer devolucion_referencia_id FK
+        +string tipo_movimiento
+        +real cantidad
+        +string practica_educativa
+        +datetime fecha
+    }
+
+    class CategoriaInsumo {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class UbicacionAlmacenamiento {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string estado
+    }
+
+    class ResiduoQuimico {
+        +integer id PK
+        +integer categoria_residuo_id FK
+        +integer usuario_id FK
+        +integer analisis_id FK
+        +integer disposicion_final_id FK
+        +datetime fecha_hora
+        +real volumen
+        +real peso
+        +text descripcion
+    }
+
+    class DisposicionFinal {
+        +integer id PK
+        +integer usuario_id FK
+        +datetime fecha
+        +string metodo_tratamiento
+        +text descripcion
+    }
+
+    class ReporteResiduos {
+        +integer id PK
+        +integer usuario_id FK
+        +string mes_anio
+        +date rango_fecha_inicio
+        +date rango_fecha_fin
+        +string ruta_archivo
+        +datetime fecha_generacion
+    }
+
+    class CategoriaResiduo {
+        +integer id PK
+        +string nombre
+        +string clase_peligrosidad
+        +text descripcion
+        +string estado
+    }
+
+    class InstruccionAlmacenamiento {
+        +integer id PK
+        +integer categoria_residuo_id FK
+        +integer paso
+        +text instruccion
+    }
+
+    class Equipo {
+        +integer id PK
+        +integer tipo_equipo_id FK
+        +string numero_serie
+        +string nombre
+        +string marca
+        +string proveedor
+        +date fecha_adquisicion
+        +date garantia_hasm
+        +integer ubicacion_id FK
+        +string estado
+        +text requisitos_uso
+    }
+
+    class TipoEquipo {
+        +integer id PK
+        +string nombre
+        +text descripcion
+        +string criticidad
+    }
+
+    class MantenimientoEquipo {
+        +integer id PK
+        +integer equipo_id FK
+        +integer usuario_id FK
+        +string tipo_mantenimiento
+        +datetime fecha
+        +text descripcion
+        +datetime proximo_mantenimiento
+    }
+
+
+    class Usuario {
+        +integer id PK
+        +integer rol_id FK
+        +string nombre
+        +string apellido
+        +string correo_electronico
+        +string contrasena_hash
+        +string estado
+        +integer intentos_fallidos
+        +datetime bloqueado_hasta
+        +datetime fecha_registro
+    }
+
+    class Rol {
+        +integer id PK
+        +string nombre
+        +text descripcion
+    }
+
+    class Auditoria {
+        +integer id PK
+        +integer usuario_id FK
+        +datetime fecha_hora
+        +string direccion_ip
+        +string modulo
+        +string accion
+        +string entidad_afectada
+        +integer entidad_id
+    }
+
+    class CambioAuditoria {
+        +integer id PK
+        +integer auditoria_id FK
+        +string campo
+        +text valor_anterior
+        +text valor_nuevo
+    }
+
+    class Reporte {
+        +integer id PK
+        +integer usuario_id FK
+        +string tipo_reporte
+        +date rango_fecha_inicio
+        +date rango_fecha_fin
+        +string ruta_archivo
+        +string formato_archivo
+        +datetime fecha_generacion
+        +string mes_anio
+    }
