@@ -17,12 +17,12 @@ Realizado para: Módulo de Bioquímica y Farmacia UNaM
 | 6 | 30/05/2026 | Desarrollo de Casos de Uso Extendidos para Acceso, Seguridad y Reportes.  | Kluka Jorge |
 | 7 | 01/06/2026 | Desarrollo de Casos de Uso Extendidos para Recursos de Laboratorio y revisión.  | Kluka Jorge |
 | 8 | 04/10/2026 | Completitud de Casos de Uso Extendidos para Laboratorio Bioquímico (UCE–DIAG-03 a UCE–DIAG-10) y especificación del reenvío automático de OTP como postcondición.  | Kluka Jorge |
-| 9 |  |  | Kluka Jorge |
-| 10 |  |  | Kluka Jorge |
-| 11 |  |  | Kluka Jorge |
-| 12 |  |  | Kluka Jorge |
-| 13 |  |  | Kluka Jorge |
-| 14 |  |  | Kluka Jorge |
+| 9 | 10/11/2026 | Corrección de reglas de negocio: DIAG-09 sin filtro por bioquímico asignado; separación de UC-LAB-11 y UC-REC-08; eliminación de "Bloqueado Temporal"; estandarización de "Invalidar Análisis"/"Invalidado".  | Kluka Jorge |
+| 10 | 10/11/2026 | Completitud de Casos de Uso de Gestión de Pacientes (UC-REC-09, 23, 24, 27, 28, 29) y sus UCE.  | Kluka Jorge |
+| 11 | 10/11/2026 | Completitud de Casos de Uso de Laboratorio Bioquímico (UC-DIAG-12, 13, 14) y sus UCE.  | Kluka Jorge |
+| 12 | 10/11/2026 | Completitud de Casos de Uso de Recursos de Laboratorio (UC-LAB-14, 17, 21) y sus UCE.  | Kluka Jorge |
+| 13 | 10/11/2026 | Completitud de Casos de Uso de Acceso y Seguridad (UC-SEG-04, 07, 08) y sus UCE.  | Kluka Jorge |
+| 14 | 10/11/2026 | Completitud de Casos de Uso de Reportes y Estadísticas (UC-REP-02) y su UCE.  | Kluka Jorge |
 
 # Índice
 # 1. Presentación General
@@ -121,7 +121,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis.<br>OBJ-03 Emisión Segura y Descarga de Resultados  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-07 Notificación de Disponibilidad de Resultados y OTP.  |
 |**Descripción**| Entidad que traza el ciclo de vida y consolida los resultados científicos de la muestra extraída al paciente.  |
-|**Datos específicos**| Tipo de muestra<br>Estado actual (Pendiente, En proceso, Terminado, Validado, Cancelado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.  |
+|**Datos específicos**| Tipo de muestra<br>Estado actual (Pendiente, En proceso, Terminado, Validado, Invalidado)<br>Observaciones/Resultados parciales<br>Fecha de validación<br>Bioquímico validador.<br>Registro de cada observación, revisión y acción con el bioquímico que la realizó.  |
 |  |  |
 |**Estabilidad**| Media |
 |**Comentarios**| - |
@@ -425,14 +425,30 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
 |**Postcondiciones**| Los parámetros de configuración quedan almacenados en el sistema y son aplicados para el cálculo de disponibilidad horaria del Agente IA.  |
 
-|**UC–REC-08**|**Bloquear/Desbloquear Días y Franjas Horarias**|
+|**UC–REC-08**|**Bloquear Días y Franjas Horarias**|
 |---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
 |**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
-|**Descripción**| El Administrador bloquea o desbloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos.  |
+|**Descripción**| El Administrador bloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos.  |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
 |**Postcondiciones**| Los días o franjas seleccionados quedan marcados como NO DISPONIBLES en la agenda. El Agente IA no ofrecerá esos horarios al momento de agendar.  |
 
+|**UC–REC-27**|**Desbloquear Días y Franjas Horarias**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| El Administrador desbloquea días completos o franjas horarias previamente bloqueadas en la agenda del laboratorio, habilitando nuevamente la asignación de turnos en esos períodos.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. Debe existir al menos un día o franja bloqueado.  |
+|**Postcondiciones**| Los días o franjas seleccionados vuelven a estar DISPONIBLES en la agenda. El Agente IA podrá ofrecer esos horarios al momento de agendar.  |
+
+|**UC–REC-09**|**Alta Temprana de Paciente**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA  |
+|**Descripción**| Subproceso de alta temprana que el Agente IA invoca como `<<include>>` de UC-REC-01 (Agendar Turno) cuando el DNI del paciente no existe en la base de datos. Registra el mínimo demográfico necesario para poder asignar el turno.  |
+|**Precondición**| El DNI del paciente no existe en la base de datos.  |
+|**Postcondiciones**| El paciente queda registrado con DNI y Nombre Completo, estado "Activo", y disponible para la asignación del turno.  |
+|**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo ni produce valor por sí mismo. Se invoca como `<<include>>` de UC-REC-01. No se confunde con UC-REC-16 (Registrar Paciente), que es el alta completa desde la interfaz web.  |
 
 |**UC–REC-10**|**Crear Indicación Médica**|
 |---|---|
@@ -541,6 +557,40 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador. El turno debe existir y estar en estado vigente. Debe haber disponibilidad en la agenda. |
 |**Postcondiciones**| El turno se actualiza con la nueva fecha/hora. El bloque anterior queda liberado. Se notifica al paciente. Incluye UC-REC-04 (Reasignación Automática). |
 
+|**UC–REC-23**|**Agregar Paciente a Lista de Espera**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-03 Gestión de Reagendación automática  |
+|**Descripción**| El Agente IA agrega automáticamente al paciente a la lista de espera cuando no hay disponibilidad en la agenda. El Administrador puede agregar manualmente a un paciente que lo solicite por teléfono o en el laboratorio.  |
+|**Precondición**| El paciente no tiene turno asignado. No hay disponibilidad en la agenda.  |
+|**Postcondiciones**| El paciente queda registrado en la lista de espera con su fecha de solicitud y prioridad.  |
+|**Comentarios**| La lista de espera es un pool independiente de UC-REC-04 (Reasignación Automática de Turno Liberado), que ofrece turnos a pacientes ya agendados.  |
+
+|**UC–REC-24**|**Agendar Serie de Turnos**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos  |
+|**Descripción**| El personal autorizado agenda una serie de turnos para un mismo estudio que requiere múltiples tomas (por ejemplo, uñas), en un solo flujo, sin repetir el agendamiento turno por turno.  |
+|**Precondición**| El paciente debe existir. El tipo de análisis debe requerir múltiples tomas.  |
+|**Postcondiciones**| Se crean los turnos de la serie, vinculados entre sí, con el mismo tipo de análisis y la misma indicación médica.  |
+|**Comentarios**| Se invoca desde UC-REC-01 (extend) o desde UC-REC-20 (Agendar Turno Manualmente).  |
+
+|**UC–REC-28**|**Quitar Paciente de Lista de Espera**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática  |
+|**Descripción**| El Administrador quita manualmente a un paciente de la lista de espera, por solicitud del paciente o por cierre de la lista.  |
+|**Precondición**| El paciente debe estar en la lista de espera.  |
+|**Postcondiciones**| El paciente queda fuera de la lista de espera.  |
+
+|**UC–REC-29**|**Consultar Lista de Espera**|
+|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención  |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática  |
+|**Descripción**| El Administrador consulta la lista de espera, ordenada por prioridad (fecha de solicitud y tipo de análisis).  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Administrador.  |
+|**Postcondiciones**| El sistema presenta la lista de espera. Operación de solo lectura.  |
+
 |**UC–REC-S-01**|**Buscar Paciente**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
@@ -609,20 +659,20 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| Los cambios quedan registrados. Se almacena una versión histórica de la ficha original (audit trail de modificaciones). |
 |**Comentarios**| Incluye `<<include>>` UC-REC-S-01 (Buscar Paciente). Cuando el análisis ya fue validado, la modificación se restringe a campos no clínicos (ej. observaciones administrativas). |
 
-|**UC–DIAG-08**|**Cancelar Análisis**|
+|**UC–DIAG-08**|**Invalidar Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-21 Cancelación de Análisis |
-|**Descripción**| El Bioquímico/Doctor cancela un análisis micológico en curso, registrando el motivo. |
+|**Descripción**| El Bioquímico/Doctor invalida un análisis micológico en curso, registrando el motivo. |
 |**Actor**| Bioquímico/Doctor, Administrador |
 |**Precondición**| El análisis debe existir y estar en estado «Pendiente» o «En Proceso» (no «Validado»). |
-|**Postcondiciones**| El estado del análisis cambia a «Cancelado». Se registra el motivo obligatorio de cancelación. El análisis cancelado permanece en el historial del paciente. |
+|**Postcondiciones**| El estado del análisis cambia a «Invalidado». Se registra el motivo obligatorio de invalidación. El análisis invalidado permanece en el historial del paciente. |
 
 |**UC–DIAG-09**|**Consultar Panel de Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico |
-|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico asignado, sin necesidad de navegar paciente por paciente. |
+|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico que registró la última acción, sin necesidad de navegar paciente por paciente. |
 |**Precondición**| Sesión activa con rol autorizado. |
 |**Postcondiciones**| El sistema presenta una tabla paginada y filtrable de análisis. Operación de solo lectura. Desde este panel se puede acceder al detalle de cada análisis y ejecutar acciones (actualizar estado, validar, cancelar). |
 |**Comentarios**| Diferente de DIAG-06 (que muestra el historial de un paciente). Este UC muestra el volumen de trabajo del laboratorio. |
@@ -637,14 +687,44 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| El catálogo queda actualizado. Los tipos desactivados no pueden seleccionarse en nuevos análisis, pero se preservan en registros históricos. |
 |**Comentarios**| Incluye sub-flujos: Crear Tipo, Modificar Tipo, Desactivar Tipo (baja lógica). |
 
+|**UC–DIAG-12**|**Reenviar Token OTP (Manual)**|
+|---|---|
+|**Objetivos asociados**| OBJ-03 Emisión Segura y Descarga de Resultados |
+|**Requisitos asociados**| RF-07 Notificación de Disponibilidad de Resultados y OTP |
+|**Descripción**| El Bioquímico/Doctor reenvía manualmente un token OTP al paciente cuando el paciente no lo recibió o el token expiró. Es el mecanismo de respaldo del reenvío automático. |
+|**Actor**| Bioquímico/Doctor |
+|**Precondición**| El análisis debe estar "Validado" y el informe no debe haber sido descargado. |
+|**Postcondiciones**| El token anterior queda invalidado y el nuevo token queda activo. |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-04 (Validar Análisis). El reenvío automático es una postcondición de UC-DIAG-04. |
+
+|**UC–DIAG-13**|**Corrección/Addendum de Análisis Validado**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RNF-04 Inmutabilidad y Retención |
+|**Descripción**| El Bioquímico/Doctor corrige o agrega información a un análisis ya validado, sin alterar el original. Se crea una nueva versión con el addendum y se registra en auditoría. |
+|**Actor**| Bioquímico/Doctor |
+|**Precondición**| El análisis debe estar "Validado". |
+|**Postcondiciones**| El análisis original queda inmutable y la nueva versión con el addendum queda registrada. |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-04 (Validar Análisis). La inmutabilidad del original se garantiza con RNF-04. |
+
+|**UC–DIAG-14**|**Rechazo de Muestra**|
+|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Cancelación de Análisis |
+|**Descripción**| El Bioquímico/Doctor rechaza una muestra por motivos de calidad (contaminada, insuficiente, inadecuada), registrando el motivo obligatorio y dejando el análisis inválido. |
+|**Actor**| Bioquímico/Doctor |
+|**Precondición**| El análisis debe estar en estado "Pendiente" o "En Proceso". |
+|**Postcondiciones**| El análisis queda "Invalidado" con el motivo de rechazo registrado. |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-08 (Invalidar Análisis). El estado "Invalidado" es el mismo que usa UC-DIAG-08. |
+
 #### 2.7.3.3 Subsistema Recursos de Laboratorio
 |**UC–LAB-01**|**Registrar Ingreso de Insumos**|
 |---|---|
 |**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |
 |**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario  |
-|**Descripción**| El Administrador accede al módulo de inventario para registrar la entrada de nuevos reactivos e insumos físicos al laboratorio, actualizando las existencias disponibles.  |
+|**Descripción**| El Administrador accede al módulo de inventario para registrar la entrada de nuevos reactivos e insumos físicos al laboratorio, actualizando las existencias disponibles y registrando el lote, su fecha de vencimiento y la ubicación de almacenamiento.  |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
-|**Postcondiciones**| El stock del insumo o reactivo seleccionado se incrementa en la cantidad especificada en la base de datos.<br>Se registra el movimiento en el historial de trazabilidad del inventario.   |
+|**Postcondiciones**| El stock del insumo o reactivo seleccionado se incrementa en la cantidad especificada en la base de datos.<br>Se registra el lote con su fecha de vencimiento y la ubicación de almacenamiento.<br>Se registra el movimiento en el historial de trazabilidad del inventario.   |
 
 |**UC–LAB-02**|**Registrar Retiro de Insumos**|
 |---|---|
@@ -728,15 +808,25 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondiciones**| El catálogo queda actualizado. Las categorías desactivadas no pueden seleccionarse en nuevos registros de residuos. |
 |**Comentarios**| Datos de la categoría: nombre, clase de peligrosidad (ej. Clase I, II, III), descripción, instrucciones de almacenamiento. |
 
-|**UC–LAB-11**|**Consultar y Modificar Registro de Residuos**|
+|**UC–LAB-11**|**Consultar Registro de Residuos**|
 |---|---|
 |**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
 |**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos |
-|**Descripción**| El usuario autorizado consulta el historial de residuos generados en un período y, si es necesario, corrige un registro erróneo (antes de que se consolide en el reporte mensual). |
+|**Descripción**| El usuario autorizado consulta el historial de residuos generados en un período, con filtros por fecha, categoría y usuario. |
 |**Actor**| Administrador, Bioquímico/Doctor, Profesor |
-|**Precondición**| Sesión activa con rol autorizado. El registro a modificar no debe haber sido incluido en un reporte mensual ya emitido. |
+|**Precondición**| Sesión activa con rol autorizado. |
+|**Postcondiciones**| El sistema presenta el historial de residuos. Operación de solo lectura. |
+|**Comentarios**| La modificación de un registro se modela en el caso de uso separado UC-LAB-21 (Modificar Registro de Residuos). |
+
+|**UC–LAB-21**|**Modificar Registro de Residuos**|
+|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
+|**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos |
+|**Descripción**| El Administrador corrige un registro de residuo erróneo antes de que se consolide en el reporte mensual. |
+|**Actor**| Administrador |
+|**Precondición**| Sesión activa con rol de Administrador. El registro no debe haber sido incluido en un reporte mensual ya emitido. |
 |**Postcondiciones**| Los datos del residuo quedan actualizados. Se registra la modificación en auditoría. |
-|**Comentarios**| Sub-flujos: Consultar (listado filtrable por fecha, categoría, usuario), Modificar (solo el autor o Administrador). |
+|**Comentarios**| Separado de UC-LAB-11 (Consultar Registro de Residuos) para no mezclar consulta y modificación. |
 
 |**UC–LAB-12**|**Gestionar Categorías de Insumos**|
 |---|---|
@@ -757,6 +847,24 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| Sesión activa con rol autorizado. |
 |**Postcondiciones**| El sistema emite un reporte en formato PDF o CSV con el resumen del inventario. |
 |**Comentarios**| Complementa a LAB-05 (consulta en pantalla) con una versión exportable para auditorías o planificación de compras. |
+
+|**UC–LAB-14**|**Registrar Disposición Final de Residuos**|
+|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos |
+|**Requisitos asociados**| RF-19 Registro de Disposición Final de Residuos |
+|**Descripción**| El Profesor o el Bioquímico registra la disposición final de los residuos químicos generados, indicando el método, la fecha y el responsable. |
+|**Actor**| Profesor, Bioquímico/Doctor, Administrador |
+|**Precondición**| Sesión activa con rol autorizado. Debe existir un residuo generado y no dispuesto. |
+|**Postcondiciones**| El residuo queda marcado como "Dispuesto" con su fecha, método y responsable. |
+
+|**UC–LAB-17**|**Consultar Alertas de Stock y Vencimiento**|
+|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control |
+|**Descripción**| El usuario consulta el panel de alertas de stock bajo y vencimiento próximo, con los insumos y lotes afectados. |
+|**Actor**| Administrador, Bioquímico/Doctor, Profesor |
+|**Precondición**| Sesión activa con rol autorizado. |
+|**Postcondiciones**| El sistema presenta las alertas. Operación de solo lectura. |
 
 #### 2.7.3.4 Subsistema Acceso y Seguridad
 |**UC–SEG-01**|**Iniciar Sesión**|
@@ -783,6 +891,30 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Precondición**| El usuario debe poseer una sesión activa en el sistema.  |
 |**Postcondiciones**| El sistema invalida la sesion, cerrando el acceso a las pantallas internas y redirigiendo al usuario a la pantalla de inicio de sesión.  |
 
+|**UC–SEG-04**|**Consultar Registro de Auditoría**|
+|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |
+|**Requisitos asociados**| RF-14 Registro Automático de Auditoría  |
+|**Descripción**| El Administrador consulta el registro de auditoría de las acciones críticas realizadas en la plataforma, con filtros por usuario, fecha y tipo de acción.  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |
+|**Postcondiciones**| El sistema presenta el registro de auditoría. Operación de solo lectura.  |
+
+|**UC–SEG-07**|**Recuperar Contraseña**|
+|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |
+|**Descripción**| El usuario recupera su contraseña mediante un enlace de recuperación enviado a su correo electrónico registrado.  |
+|**Precondición**| El usuario debe poseer una cuenta registrada en el sistema.  |
+|**Postcondiciones**| La contraseña queda actualizada y el usuario puede iniciar sesión.  |
+
+|**UC–SEG-08**|**Cambiar Contraseña**|
+|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |
+|**Descripción**| El usuario cambia su contraseña desde su sesión activa, ingresando la contraseña actual y la nueva.  |
+|**Precondición**| El usuario debe poseer una sesión activa en el sistema.  |
+|**Postcondiciones**| La contraseña queda actualizada.  |
+
 #### 2.7.3.5 Subsistema Reportes y Estadísticas
 |**UC-REP-01**|**Consolidar y Exportar Datos Operativos**|
 |---|---|
@@ -791,6 +923,14 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Descripción**| El sistema procesa los datos transaccionales acumulados para estructurar análisis estadísticos. Permite cruzar información clínica, de inventario y de desechos, y exportarla como base para trabajos de investigación académica o auditorías.  |
 |**Precondición**| El usuario debe tener una sesión activa con los privilegios necesarios (Bioquímico/Doctor o Administrador). <br>Deben existir datos transaccionales previos registrados en la plataforma.  |
 |**Postcondiciones**| El sistema emite un conjunto de datos consolidado para su visualización y permite su descarga en formato compatible para análisis externo (exportación).  |
+
+|**UC-REP-02**|**Consultar Panel de Control (Dashboard)**|
+|---|---|
+|**Objetivos asociados**| Transversal (Generación de Información)  |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control.<br>RF-15 Consolidación y Exportación de Datos Operativos  |
+|**Descripción**| El usuario consulta el panel de control con indicadores de turnos, análisis, inventario y residuos.  |
+|**Precondición**| El usuario debe tener una sesión activa con los privilegios necesarios (Bioquímico/Doctor o Administrador).  |
+|**Postcondiciones**| El sistema presenta el panel de control. Operación de solo lectura.  |
 
 ## 2.8 Casos de Uso Extendidos
 ### 2.8.1 Subsistema Gestión de Pacientes
@@ -957,11 +1097,11 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
 
-|**UCE–REC-08**|**Bloquear/Desbloquear Días y Franjas Horarias**|  |
+|**UCE–REC-08**|**Bloquear Días y Franjas Horarias**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
 |**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
-|**Descripción**| El Administrador bloquea o desbloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos. |  |
+|**Descripción**| El Administrador bloquea días completos o franjas horarias específicas en la agenda del laboratorio, inhabilitando temporalmente la asignación de turnos en esos períodos. |  |
 |**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El Administrador ingresa al calendario y selecciona la opción "Bloquear Día/Franja". |
@@ -979,10 +1119,55 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 6 | Menos de 2 segundos |
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| El desbloqueo sigue el mismo flujo inverso, seleccionando días bloqueados y presionando "Desbloquear". |  |
+|**Comentarios**| El desbloqueo se modela en el caso de uso separado UCE-REC-27 (Desbloquear Días y Franjas Horarias). |  |
 
+|**UCE–REC-27**|**Desbloquear Días y Franjas Horarias**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| El Administrador desbloquea días completos o franjas horarias previamente bloqueadas en la agenda del laboratorio, habilitando nuevamente la asignación de turnos. |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. Debe existir al menos un día o franja bloqueado. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al calendario y selecciona la opción "Desbloquear Día/Franja". |
+|  | 2 | La interfaz muestra el calendario con los días y franjas bloqueados. |
+|  | 3 | El Administrador selecciona el día o rango de fechas a desbloquear. |
+|  | 4 | El Administrador elige si desbloquea el día completo o una franja horaria específica. |
+|  | 5 | El Administrador presiona "Confirmar Desbloqueo". |
+|  | 6 | El sistema valida que el día o franja esté bloqueado. |
+|  | 7 | El sistema marca los bloques como DISPONIBLES en la agenda. |
+|  | 8 | El sistema registra el evento en la tabla de auditoría. |
+|**Postcondición**| Los días o franjas seleccionados vuelven a estar DISPONIBLES. |  |
+|**Excepciones**|**Paso**|  |
+|  | 6 | Si el día o franja no está bloqueado, el sistema informa y no realiza cambios. |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 2 segundos |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
 
-*Nota: No existe UC–REC-09. La numeración salta intencionalmente de UC–REC-08 a UC–REC-10.*
+|**UCE–REC-09**|**Alta Temprana de Paciente**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA |  |
+|**Descripción**| Subproceso de alta temprana que el Agente IA invoca como `<<include>>` de UC-REC-01 cuando el DNI del paciente no existe en la base de datos. |  |
+|**Precondición**| El DNI del paciente no existe en la base de datos. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Agente IA solicita el DNI y el Nombre Completo del paciente. |
+|  | 2 | El paciente ingresa los datos. |
+|  | 3 | El Agente IA valida el formato del DNI. |
+|  | 4 | El sistema consulta la base de datos y confirma que el DNI no existe. |
+|  | 5 | El sistema crea el registro del paciente con DNI y Nombre Completo, estado "Activo". |
+|  | 6 | El sistema registra el evento en la tabla de auditoría. |
+|  | 7 | El sistema retorna el control a UC-REC-01 para continuar con la asignación del turno. |
+|**Postcondición**| El paciente queda registrado con DNI y Nombre Completo, estado "Activo". |  |
+|**Excepciones**|**Paso**|  |
+|  | 3 | Si el formato del DNI es inválido, el sistema solicita su reingreso. |
+|  | 4 | Si el DNI ya existe, el sistema retorna el paciente existente a UC-REC-01 y no crea un duplicado. |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo. |
+|**Frecuencia**| Alta (invocado por UC-REC-01) |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Caso de uso puramente estructural (include-only). No tiene actor directo. No se confunde con UC-REC-16 (Registrar Paciente), que es el alta completa desde la interfaz web. |  |
 
 
 |**UCE–REC-10**|**Crear Indicación Médica**|  |
@@ -1320,6 +1505,98 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
 
+|**UCE–REC-23**|**Agregar Paciente a Lista de Espera**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-03 Gestión de Reagendación automática |  |
+|**Descripción**| El Agente IA agrega automáticamente al paciente a la lista de espera cuando no hay disponibilidad en la agenda. El Administrador puede agregar manualmente a un paciente que lo solicite por teléfono o en el laboratorio. |  |
+|**Precondición**| El paciente no tiene turno asignado. No hay disponibilidad en la agenda. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El paciente solicita un turno al Agente IA. |
+|  | 2 | El Agente IA consulta la agenda y no encuentra disponibilidad. |
+|  | 3 | El Agente IA informa al paciente y le ofrece ingresar a la lista de espera. |
+|  | 4 | El paciente acepta. |
+|  | 5 | El Agente IA registra al paciente en la lista de espera con su fecha de solicitud. |
+|  | 6 | El sistema registra el evento en la tabla de auditoría. |
+|  | 7 | El Agente IA confirma la inscripción al paciente. |
+|**Postcondición**| El paciente queda en la lista de espera con su fecha de solicitud y prioridad. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el paciente rechaza, el sistema finaliza el flujo sin registrarlo. |
+|  | 5 | Si el paciente ya está en la lista, el sistema informa y no duplica el registro. |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo. |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| La lista de espera es un pool independiente de UC-REC-04 (Reasignación Automática de Turno Liberado), que ofrece turnos a pacientes ya agendados. |  |
+
+|**UCE–REC-24**|**Agendar Serie de Turnos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-01 Agendamiento de Turnos vía Agente IA.<br>RF-04 Cancelación y Reprogramación de Turnos |  |
+|**Descripción**| El personal autorizado agenda una serie de turnos para un mismo estudio que requiere múltiples tomas, en un solo flujo. |  |
+|**Precondición**| El paciente debe existir. El tipo de análisis debe requerir múltiples tomas. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Gestión de Agenda y selecciona "Nuevo Turno Seriado". |
+|  | 2 | El sistema solicita el DNI del paciente y el tipo de análisis. |
+|  | 3 | El usuario ingresa los datos y la cantidad de tomas requeridas. |
+|  | 4 | El sistema calcula la disponibilidad para cada toma según la periodicidad del estudio. |
+|  | 5 | El usuario selecciona las fechas y horarios para cada toma. |
+|  | 6 | El sistema registra los turnos y los vincula entre sí. |
+|  | 7 | El sistema envía la confirmación y las indicaciones médicas al paciente. |
+|  | 8 | El sistema registra el evento en la tabla de auditoría. |
+|**Postcondición**| Los turnos de la serie quedan registrados y vinculados entre sí. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si no hay disponibilidad para alguna toma, el sistema informa y solicita ajustar las fechas. |
+|  | 6 | Si una franja se ocupa entre la consulta y la confirmación, el sistema rechaza la serie y solicita una nueva selección. |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 2 segundos. |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se invoca desde UC-REC-01 (extend) o desde UC-REC-20 (Agendar Turno Manualmente). |  |
+
+|**UCE–REC-28**|**Quitar Paciente de Lista de Espera**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática |  |
+|**Descripción**| El Administrador quita manualmente a un paciente de la lista de espera, por solicitud del paciente o por cierre de la lista. |  |
+|**Precondición**| El paciente debe estar en la lista de espera. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa a la lista de espera. |
+|  | 2 | El sistema muestra la lista ordenada por prioridad. |
+|  | 3 | El Administrador selecciona el paciente y presiona "Quitar". |
+|  | 4 | El sistema solicita confirmación. |
+|  | 5 | El Administrador confirma. |
+|  | 6 | El sistema quita al paciente de la lista. |
+|  | 7 | El sistema registra el evento en la tabla de auditoría. |
+|**Postcondición**| El paciente queda fuera de la lista de espera. |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el Administrador cancela la confirmación, el sistema no modifica la lista. |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo. |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–REC-29**|**Consultar Lista de Espera**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-01 Automatización de la Gestión de Turnos y Atención |  |
+|**Requisitos asociados**| RF-03 Gestión de Reagendación automática |  |
+|**Descripción**| El Administrador consulta la lista de espera, ordenada por prioridad (fecha de solicitud y tipo de análisis). |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Administrador. |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa a la lista de espera. |
+|  | 2 | El sistema consulta la lista y la ordena por prioridad. |
+|  | 3 | El Administrador aplica filtros opcionales (tipo de análisis, fecha de solicitud). |
+|  | 4 | El sistema muestra la lista actualizada. |
+|**Postcondición**| El sistema presenta la lista de espera. Operación de solo lectura. |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si la lista está vacía, el sistema informa "No hay pacientes en lista de espera". |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 2 segundos. |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
 |**UCE–REC-S-01**|**Buscar Paciente**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico |  |
@@ -1397,7 +1674,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico  |  |
-|**Descripción**| El Bioquímico/Doctor carga los resultados parciales u observaciones obtenidos durante el procesamiento de la muestra y avanza el estado del estudio dentro del flujo de trabajo (Pendiente → En Proceso → Terminado).  |  |
+|**Descripción**| El Bioquímico/Doctor carga los resultados parciales u observaciones obtenidos durante el procesamiento de la muestra y avanza el estado del estudio dentro del flujo de trabajo (Pendiente → En Proceso → Terminado). El sistema registra cada observación, revisión y acción con el bioquímico que la realizó.  |  |
 |**Precondición**| Debe existir un Análisis Micológico en estado "Pendiente" o "En Proceso".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El Bioquímico ingresa al módulo de Análisis o accede desde el Panel de Análisis (UC–DIAG-09).  |
@@ -1406,19 +1683,19 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 4 | El Bioquímico selecciona el nuevo estado del estudio (En Proceso o Terminado).  |
 |  | 5 | El sistema valida que la transición de estado sea la siguiente en el flujo (Pendiente → En Proceso → Terminado).  |
 |  | 6 | El sistema persiste los datos y actualiza el estado del análisis.  |
-|  | 7 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 7 | El sistema registra el evento en la tabla de auditoría con el bioquímico que realizó la acción.  |
 |  | 8 | La interfaz confirma la actualización y actualiza el panel.  |
-|**Postcondición**| Los parámetros, observaciones y resultados parciales quedan guardados en la base de datos. El estado del análisis avanza según la selección del usuario.  |  |
+|**Postcondición**| Los parámetros, observaciones y resultados parciales quedan guardados en la base de datos. El estado del análisis avanza según la selección del usuario. Cada observación, revisión y acción queda registrada con el bioquímico que la realizó.  |  |
 |**Excepciones**|**Paso**|  |
 |  | 5 | Si la transición de estado no es válida (por ejemplo, intentar pasar de "Pendiente" directamente a "Terminado"), el sistema rechaza la operación y mantiene el estado actual.  |
-|  | 6 | Si el análisis se encuentra en estado "Cancelado" o "Validado", el sistema bloquea la actualización.  |
+|  | 6 | Si el análisis se encuentra en estado "Invalidado" o "Validado", el sistema bloquea la actualización.  |
 |  | 6 | Si ocurre un error de conexión con la base de datos, el sistema aborta la transacción sin guardar datos parciales.  |
 |**Rendimiento**|**Paso**|  |
 |  | 5 | Menos de 1 segundo.  |
 |  | 6 | Menos de 1 segundo.  |
 |**Frecuencia**| Alta |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| El estado "Validado" solo se alcanza mediante UC–DIAG-04. Un análisis cancelado no puede reanudarse sin una nueva muestra.  |  |
+|**Comentarios**| El estado "Validado" solo se alcanza mediante UC–DIAG-04. Un análisis invalidado no puede reanudarse sin una nueva muestra.  |  |
 
 |**UCE–DIAG-04**|**Validar Análisis**|  |
 |---|---|---|
@@ -1530,46 +1807,46 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Alta |  |
 |**Comentarios**| Se invoca como `<<extend>>` de UC–DIAG-01 (Registrar Ficha Clínica). El versionado garantiza trazabilidad del historial clínico (RF-20).  |  |
 
-|**UCE–DIAG-08**|**Cancelar Análisis**|  |
+|**UCE–DIAG-08**|**Invalidar Análisis**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
 |**Requisitos asociados**| RF-21 Cancelación de Análisis.<br>RF-06 Actualización de Estados de Análisis Micológico.  |  |
-|**Descripción**| El Bioquímico/Doctor o Administrador cancela un análisis micológico en curso, registrando obligatoriamente el motivo.  |  |
+|**Descripción**| El Bioquímico/Doctor o Administrador invalida un análisis micológico en curso, registrando obligatoriamente el motivo.  |  |
 |**Precondición**| El análisis debe existir y estar en estado "Pendiente" o "En Proceso".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El usuario accede al detalle del análisis (desde el panel o el historial del paciente).  |
 |  | 2 | El sistema muestra el análisis con su estado actual.  |
-|  | 3 | El usuario presiona "Cancelar Análisis".  |
-|  | 4 | El sistema solicita el motivo obligatorio de cancelación.  |
+|  | 3 | El usuario presiona "Invalidar Análisis".  |
+|  | 4 | El sistema solicita el motivo obligatorio de invalidación.  |
 |  | 5 | El usuario ingresa el motivo.  |
-|  | 6 | El sistema valida que el estado del análisis permita la cancelación.  |
-|  | 7 | El sistema cambia el estado del análisis a "Cancelado".  |
+|  | 6 | El sistema valida que el estado del análisis permita la invalidación.  |
+|  | 7 | El sistema cambia el estado del análisis a "Invalidado".  |
 |  | 8 | El sistema registra el evento en la tabla de auditoría.  |
-|  | 9 | La interfaz confirma la cancelación.  |
-|**Postcondición**| El estado del análisis cambia a "Cancelado", el motivo queda registrado y el análisis cancelado permanece en el historial del paciente.  |  |
+|  | 9 | La interfaz confirma la invalidación.  |
+|**Postcondición**| El estado del análisis cambia a "Invalidado", el motivo queda registrado y el análisis invalidado permanece en el historial del paciente.  |  |
 |**Excepciones**|**Paso**|  |
-|  | 6 | Si el análisis está en estado "Validado", el sistema bloquea la cancelación: el análisis validado es definitivo.  |
-|  | 6 | Si el análisis ya está "Cancelado", el sistema informa y finaliza.  |
+|  | 6 | Si el análisis está en estado "Validado", el sistema bloquea la invalidación: el análisis validado es definitivo.  |
+|  | 6 | Si el análisis ya está "Invalidado", el sistema informa y finaliza.  |
 |  | 5 | Si el motivo está vacío, el sistema bloquea el paso.  |
 |**Rendimiento**|**Paso**|  |
 |  | 7 | Menos de 1 segundo.  |
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
-|**Comentarios**| Una muestra contaminada, extraviada o un paciente que desiste justifican la cancelación (RF-21). Evita que análisis no viables continúen su procesamiento y libera recursos del laboratorio.  |  |
+|**Comentarios**| Una muestra contaminada, extraviada o un paciente que desiste justifican la invalidación (RF-21). Evita que análisis no viables continúen su procesamiento y libera recursos del laboratorio.  |  |
 
 |**UCE–DIAG-09**|**Consultar Panel de Análisis**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
 |**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico  |  |
-|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico asignado, sin necesidad de navegar paciente por paciente.  |  |
+|**Descripción**| El Bioquímico/Doctor accede a un panel de trabajo que lista todos los análisis micológicos, filtrables por estado, tipo de análisis, fecha y bioquímico que registró la última acción, sin necesidad de navegar paciente por paciente.  |  |
 |**Precondición**| El usuario debe tener una sesión activa con rol de Bioquímico/Doctor o Administrador.  |  |
 |**Secuencia normal**|**Paso**|  |
 |  | 1 | El usuario ingresa al "Panel de Análisis" del módulo clínico.  |
 |  | 2 | El sistema lista todos los análisis de forma paginada.  |
-|  | 3 | El usuario aplica filtros (estado, tipo de análisis, rango de fechas, bioquímico).  |
+|  | 3 | El usuario aplica filtros (estado, tipo de análisis, rango de fechas, bioquímico que registró la última acción).  |
 |  | 4 | El sistema filtra y actualiza el listado.  |
 |  | 5 | El usuario selecciona un análisis para ver su detalle.  |
-|  | 6 | El sistema muestra el detalle con las acciones habilitadas según el estado (actualizar, validar, cancelar).  |
+|  | 6 | El sistema muestra el detalle con las acciones habilitadas según el estado (actualizar, validar, invalidar).  |
 |**Postcondición**| El panel presenta el volumen de trabajo del laboratorio. Operación de solo lectura.  |
 |**Excepciones**|**Paso**|  |
 |  | 4 | Si no hay análisis que cumplan los filtros, el sistema informa y muestra el listado vacío.  |
@@ -1604,9 +1881,461 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Estabilidad**| Media |  |
 |**Comentarios**| Incluye sub-flujos: Crear Tipo, Modificar Tipo, Desactivar Tipo (baja lógica). La relación entre tipo de análisis y tipos de muestra válidos alimenta los selectores de UC–DIAG-02.  |  |
 
+|**UCE–DIAG-12**|**Reenviar Token OTP (Manual)**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-03 Emisión Segura y Descarga de Resultados  |  |
+|**Requisitos asociados**| RF-07 Notificación de Disponibilidad de Resultados y OTP  |  |
+|**Descripción**| El Bioquímico/Doctor reenvía manualmente un token OTP al paciente cuando el paciente no lo recibió o el token expiró. Es el mecanismo de respaldo del reenvío automático.  |  |
+|**Precondición**| El análisis debe estar "Validado" y el informe no debe haber sido descargado. El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario accede al análisis validado y selecciona "Reenviar OTP".  |
+|  | 2 | El sistema invalida el token anterior.  |
+|  | 3 | El sistema genera un nuevo token OTP con TTL de 7 días.  |
+|  | 4 | El sistema envía el nuevo token por WhatsApp al paciente.  |
+|  | 5 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 6 | La interfaz confirma el reenvío.  |
+|**Postcondición**| El token anterior queda invalidado y el nuevo token queda activo.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 1 | Si el análisis no está "Validado", el sistema bloquea la operación.  |
+|  | 1 | Si el informe ya fue descargado, el sistema informa que no es necesario reenviar.  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-04 (Validar Análisis). El reenvío automático es una postcondición de UC-DIAG-04.  |  |
+
+|**UCE–DIAG-13**|**Corrección/Addendum de Análisis Validado**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RNF-04 Inmutabilidad y Retención  |  |
+|**Descripción**| El Bioquímico/Doctor corrige o agrega información a un análisis ya validado, sin alterar el original. Se crea una nueva versión con el addendum y se registra en auditoría.  |  |
+|**Precondición**| El análisis debe estar "Validado". El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario accede al análisis validado y selecciona "Corregir/Agregar Addendum".  |
+|  | 2 | El sistema muestra el análisis original en modo lectura.  |
+|  | 3 | El usuario ingresa el motivo de la corrección y el contenido del addendum.  |
+|  | 4 | El sistema valida que el motivo y el contenido no estén vacíos.  |
+|  | 5 | El sistema crea una nueva versión del análisis con el addendum, sin modificar el original.  |
+|  | 6 | El sistema registra la corrección en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la corrección.  |
+|**Postcondición**| El análisis original queda inmutable y la nueva versión con el addendum queda registrada.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 1 | Si el análisis no está "Validado", el sistema bloquea la operación.  |
+|  | 4 | Si el motivo o el contenido están vacíos, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-04 (Validar Análisis). La inmutabilidad del original se garantiza con RNF-04.  |  |
+
+|**UCE–DIAG-14**|**Rechazo de Muestra**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Cancelación de Análisis  |  |
+|**Descripción**| El Bioquímico/Doctor rechaza una muestra por motivos de calidad (contaminada, insuficiente, inadecuada), registrando el motivo obligatorio y dejando el análisis inválido.  |  |
+|**Precondición**| El análisis debe estar en estado "Pendiente" o "En Proceso". El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario accede al análisis y selecciona "Rechazar Muestra".  |
+|  | 2 | El sistema muestra el análisis y el tipo de muestra.  |
+|  | 3 | El usuario selecciona el motivo de rechazo (contaminada, insuficiente, inadecuada, otro).  |
+|  | 4 | El usuario ingresa la observación obligatoria.  |
+|  | 5 | El sistema valida que el estado permita el rechazo.  |
+|  | 6 | El sistema cambia el estado del análisis a "Invalidado".  |
+|  | 7 | El sistema registra el motivo y la observación en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma el rechazo.  |
+|**Postcondición**| El análisis queda "Invalidado" con el motivo de rechazo registrado.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si el análisis está "Validado", el sistema bloquea el rechazo.  |
+|  | 4 | Si la observación está vacía, el sistema bloquea el paso.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Se invoca como `<<extend>>` de UC-DIAG-08 (Invalidar Análisis). El estado "Invalidado" es el mismo que usa UC-DIAG-08.  |  |
+
 ### 2.8.3 Subsistema Recursos de Laboratorio
 
-*UCEs pendientes de desarrollo. Se requiere desarrollar los UCE correspondientes a UC–LAB-01 (Registrar Ingreso de Insumos), UC–LAB-02 (Registrar Retiro de Insumos), UC–LAB-03 (Registrar Generación de Residuos), UC–LAB-04 (Generar Reporte de Residuos), UC–LAB-05 (Consultar Inventario), y los nuevos UC–LAB-06 a UC–LAB-13.*
+|**UCE–LAB-01**|**Registrar Ingreso de Insumos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario  |  |
+|**Descripción**| El Administrador registra el ingreso de nuevos reactivos e insumos al laboratorio, actualizando el stock y la trazabilidad del lote.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. El insumo debe existir en el catálogo (o crearse dentro del flujo).  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Inventario y presiona "Registrar Ingreso".  |
+|  | 2 | El sistema solicita el insumo, la cantidad, el número de lote, la fecha de vencimiento y la ubicación de almacenamiento.  |
+|  | 3 | El Administrador selecciona el insumo y completa los datos.  |
+|  | 4 | El sistema valida que el insumo esté activo y que la cantidad sea mayor a cero.  |
+|  | 5 | El sistema registra el movimiento de ingreso y actualiza el stock.  |
+|  | 6 | El sistema registra el lote con su fecha de vencimiento.  |
+|  | 7 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma el ingreso exitoso.  |
+|**Postcondición**| El stock del insumo se incrementa y el movimiento de ingreso queda registrado con su lote.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 3 | Si el insumo no existe, el sistema ofrece crearlo (UC-LAB-06).  |
+|  | 4 | Si la cantidad es inválida, el sistema rechaza la operación.  |
+|  | 6 | Si el lote ya existe, el sistema rechaza la operación o suma la cantidad al lote existente.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| El ingreso registra el lote, su fecha de vencimiento y la ubicación de almacenamiento.  |  |
+
+|**UCE–LAB-02**|**Registrar Retiro de Insumos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario.<br>RF-09 Alertas de Stock en Panel de Control.  |  |
+|**Descripción**| El Profesor o el Bioquímico registra el retiro de insumos para prácticas educativas o análisis clínicos, con trazabilidad del lote, la ubicación y el análisis o práctica de destino.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con los permisos correspondientes (Profesor, Bioquímico o Administrador). El sistema debe contar con stock suficiente.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Inventario y presiona "Registrar Retiro".  |
+|  | 2 | El sistema solicita el insumo, la cantidad, el lote, la ubicación de origen y el análisis o práctica de destino.  |
+|  | 3 | El usuario completa los datos.  |
+|  | 4 | El sistema valida el stock disponible y el lote vigente (FIFO/FEFO).  |
+|  | 5 | El sistema deduce la cantidad del stock y registra el movimiento.  |
+|  | 6 | El sistema verifica el umbral mínimo y la fecha de vencimiento, y muestra la alerta si corresponde.  |
+|  | 7 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma el retiro exitoso.  |
+|**Postcondición**| El stock se deduce de forma inmediata y el movimiento de retiro queda registrado con su trazabilidad.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el stock es insuficiente, el sistema rechaza la operación.  |
+|  | 4 | Si el lote está vencido, el sistema advierte y solicita confirmación.  |
+|  | 5 | Si el insumo está inactivo, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-03**|**Registrar Generación de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos  |  |
+|**Descripción**| El Profesor o el Bioquímico registra el volumen y peso de los residuos químicos generados tras una actividad de laboratorio o práctica educativa.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Profesor, Bioquímico o Administrador. La categoría de residuo debe existir.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Residuos y presiona "Registrar Residuo".  |
+|  | 2 | El sistema solicita la categoría, el volumen, el peso, la descripción y el análisis o práctica de origen.  |
+|  | 3 | El usuario completa los datos.  |
+|  | 4 | El sistema valida que la categoría esté activa y que el volumen y el peso sean mayores a cero.  |
+|  | 5 | El sistema registra el residuo y lo vincula al usuario y a la fecha.  |
+|  | 6 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma el registro.  |
+|**Postcondición**| El residuo queda registrado con volumen, peso, categoría, usuario y fecha.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 3 | Si la categoría no existe, el sistema ofrece crearla (UC-LAB-10).  |
+|  | 4 | Si los valores son inválidos, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-04**|**Generar Reporte de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-12 Generación de Reporte Mensual de Residuos  |  |
+|**Descripción**| El sistema consolida los registros de residuos del mes en curso y genera el documento estructurado exigido por las normativas vigentes.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. Deben existir residuos registrados en el período.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Residuos y presiona "Generar Reporte Mensual".  |
+|  | 2 | El sistema solicita el mes y el año.  |
+|  | 3 | El Administrador selecciona el período.  |
+|  | 4 | El sistema consolida los residuos del período.  |
+|  | 5 | El sistema genera el documento en formato PDF o CSV.  |
+|  | 6 | El sistema registra el reporte y el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la generación.  |
+|**Postcondición**| El reporte queda generado y almacenado con las cantidades y tipos de residuos del mes.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si no hay residuos en el período, el sistema informa y detiene el flujo.  |
+|  | 5 | Si el reporte del período ya existe, el sistema advierte y solicita confirmación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Hasta 5 segundos.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-05**|**Consultar Inventario**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario  |  |
+|**Descripción**| Los usuarios internos consultan el inventario actual de reactivos e insumos, con cantidades, estados y filtros de vencimiento o agotamiento.  |  |
+|**Precondición**| El usuario debe tener una sesión activa (Administrador, Bioquímico/Doctor o Profesor).  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Inventario.  |
+|  | 2 | El sistema muestra el listado paginado de insumos.  |
+|  | 3 | El usuario aplica filtros (nombre, tipo, próximos a vencer o agotar).  |
+|  | 4 | El sistema consulta y retorna los resultados.  |
+|  | 5 | El usuario selecciona un insumo para ver el detalle.  |
+|  | 6 | El sistema muestra el detalle: stock, lotes, ubicaciones y movimientos.  |
+|**Postcondición**| El sistema presenta el inventario actual. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay insumos registrados, el sistema muestra "No hay insumos registrados".  |
+|  | 4 | Si ningún insumo coincide con los filtros, el sistema muestra "No se encontraron insumos".  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-06**|**Gestionar Catálogo de Insumos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario  |  |
+|**Descripción**| El Administrador gestiona el catálogo de insumos: crear, modificar y desactivar (baja lógica).  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Catálogos.  |
+|  | 2 | El sistema lista los insumos.  |
+|  | 3 | El usuario selecciona la operación: Crear, Modificar o Desactivar.  |
+|  | 4 | El usuario ingresa los datos (nombre, descripción, unidad de medida, categoría, umbral mínimo, ubicación).  |
+|  | 5 | El sistema valida la unicidad del nombre y la coherencia de los datos.  |
+|  | 6 | El sistema persiste el cambio y registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la operación.  |
+|**Postcondición**| El catálogo queda actualizado. Los insumos desactivados no reciben nuevos ingresos ni retiros, pero sus movimientos históricos se preservan.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si el nombre ya existe, el sistema rechaza la operación y solicita otro nombre.  |
+|  | 6 | Si se desactiva un insumo con movimientos históricos, el sistema aplica baja lógica conservando los registros.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-07**|**Consultar Trazabilidad de Movimientos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario  |  |
+|**Descripción**| El usuario autorizado consulta el historial completo de movimientos de un insumo o de todos los insumos en un rango de fechas.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol autorizado.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Inventario y selecciona "Trazabilidad".  |
+|  | 2 | El sistema solicita el insumo (opcional) y el rango de fechas.  |
+|  | 3 | El usuario ingresa los filtros.  |
+|  | 4 | El sistema consulta y retorna la tabla cronológica de movimientos.  |
+|  | 5 | El usuario puede filtrar o exportar el resultado.  |
+|**Postcondición**| El sistema presenta la tabla cronológica de movimientos. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si no hay movimientos, el sistema informa.  |
+|  | 2 | Si el rango de fechas es inválido, el sistema rechaza la consulta.  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Filtrable por insumo, tipo de movimiento, rango de fechas y usuario.  |  |
+
+|**UCE–LAB-08**|**Configurar Umbrales de Alerta**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control  |  |
+|**Descripción**| El Administrador configura los umbrales mínimos de stock y los días de anticipación para las alertas de vencimiento de cada insumo.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador. El insumo debe existir en el catálogo.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Inventario y selecciona el insumo.  |
+|  | 2 | El sistema muestra los umbrales actuales.  |
+|  | 3 | El usuario modifica el umbral mínimo y los días de anticipación.  |
+|  | 4 | El sistema valida que los valores sean mayores a cero.  |
+|  | 5 | El sistema persiste los cambios.  |
+|  | 6 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la configuración.  |
+|**Postcondición**| Los umbrales quedan configurados y el dashboard refleja las alertas cuando el stock está por debajo del umbral o un lote está dentro del período de pre-vencimiento.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si el insumo no existe, el sistema informa.  |
+|  | 4 | Si los valores son inválidos, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Umbrales por defecto: stock mínimo = 1 unidad, alerta de vencimiento = 30 días.  |  |
+
+|**UCE–LAB-09**|**Registrar Devolución de Insumos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario  |  |
+|**Descripción**| El Profesor o el Bioquímico registra la devolución de insumos no utilizados al inventario, revirtiendo total o parcialmente un retiro previo.  |  |
+|**Precondición**| Debe existir un retiro previo registrado. La cantidad a devolver no puede superar la cantidad retirada.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Inventario y presiona "Registrar Devolución".  |
+|  | 2 | El sistema solicita el retiro original y la cantidad a devolver.  |
+|  | 3 | El usuario selecciona el retiro y completa la cantidad.  |
+|  | 4 | El sistema valida que la cantidad no supere la cantidad retirada.  |
+|  | 5 | El sistema incrementa el stock y registra el movimiento de devolución.  |
+|  | 6 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la devolución.  |
+|**Postcondición**| El stock se incrementa en la cantidad devuelta y se registra el movimiento como «Devolución» vinculado al retiro original.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si la cantidad supera la cantidad retirada, el sistema rechaza la operación.  |
+|  | 5 | Si el lote original ya venció, el sistema advierte y registra la devolución como «Vencido — no utilizable».  |
+|**Rendimiento**|**Paso**|  |
+|  | 5 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-10**|**Gestionar Categorías de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario  |  |
+|**Descripción**| El Administrador gestiona el catálogo de categorías de residuos químicos: crear, modificar y desactivar (baja lógica).  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Catálogos.  |
+|  | 2 | El sistema lista las categorías de residuos.  |
+|  | 3 | El usuario selecciona la operación: Crear, Modificar o Desactivar.  |
+|  | 4 | El usuario ingresa los datos (nombre, clase de peligrosidad, descripción, instrucciones de almacenamiento).  |
+|  | 5 | El sistema valida la unicidad del nombre.  |
+|  | 6 | El sistema persiste el cambio y registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la operación.  |
+|**Postcondición**| El catálogo queda actualizado. Las categorías desactivadas no pueden seleccionarse en nuevos registros de residuos.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si el nombre ya existe, el sistema rechaza la operación y solicita otro nombre.  |
+|  | 6 | Si se desactiva una categoría con residuos históricos, el sistema aplica baja lógica conservando los registros.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| - |  |
+
+|**UCE–LAB-11**|**Consultar Registro de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos  |  |
+|**Descripción**| El usuario autorizado consulta el historial de residuos generados en un período, con filtros por fecha, categoría y usuario.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol autorizado.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Residuos.  |
+|  | 2 | El sistema muestra el listado paginado de residuos.  |
+|  | 3 | El usuario aplica filtros (fecha, categoría, usuario).  |
+|  | 4 | El sistema consulta y retorna los resultados.  |
+|  | 5 | El usuario selecciona un residuo para ver el detalle.  |
+|**Postcondición**| El sistema presenta el historial de residuos. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay residuos registrados, el sistema informa.  |
+|  | 4 | Si ningún residuo coincide con los filtros, el sistema muestra "No se encontraron residuos".  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| La corrección de un registro se modela en el caso de uso separado UC–LAB-21 (Modificar Registro de Residuos).  |  |
+
+|**UCE–LAB-12**|**Gestionar Categorías de Insumos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-17 Gestión de Catálogos de Inventario  |  |
+|**Descripción**| El Administrador gestiona el catálogo de categorías de insumos (reactivos, medios de cultivo, materiales descartables, equipos): crear, modificar y desactivar.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Catálogos.  |
+|  | 2 | El sistema lista las categorías de insumos.  |
+|  | 3 | El usuario selecciona la operación: Crear, Modificar o Desactivar.  |
+|  | 4 | El usuario ingresa los datos (nombre, descripción).  |
+|  | 5 | El sistema valida la unicidad del nombre.  |
+|  | 6 | El sistema persiste el cambio y registra el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la operación.  |
+|**Postcondición**| El catálogo queda actualizado y los insumos pueden clasificarse por categoría.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 5 | Si el nombre ya existe, el sistema rechaza la operación y solicita otro nombre.  |
+|  | 6 | Si se desactiva una categoría con insumos asociados, el sistema aplica baja lógica conservando los registros.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| Facilita filtros en consultas de inventario (UC-LAB-05) y reportes (UC-LAB-13).  |  |
+
+|**UCE–LAB-13**|**Generar Reporte de Inventario**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-10 Gestión de Ingresos y Retiros de Inventario.<br>RF-09 Alertas de Stock en Panel de Control.  |  |
+|**Descripción**| El Administrador genera un reporte del estado del inventario en un momento dado, incluyendo stock actual, movimientos del período, insumos bajo umbral y próximos a vencer.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol autorizado.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Reportes.  |
+|  | 2 | El sistema solicita el tipo de reporte y el período.  |
+|  | 3 | El usuario selecciona los parámetros.  |
+|  | 4 | El sistema consulta y consolida los datos.  |
+|  | 5 | El sistema genera el reporte en formato PDF o CSV.  |
+|  | 6 | El sistema registra el reporte y el evento en la tabla de auditoría.  |
+|  | 7 | La interfaz confirma la generación.  |
+|**Postcondición**| El sistema emite un reporte con el resumen del inventario.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si no hay datos para el período, el sistema informa.  |
+|  | 5 | Si el formato no es válido, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Hasta 5 segundos.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Media |  |
+|**Comentarios**| Complementa a UC-LAB-05 (consulta en pantalla) con una versión exportable para auditorías o planificación de compras.  |  |
+
+|**UCE–LAB-14**|**Registrar Disposición Final de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-19 Registro de Disposición Final de Residuos  |  |
+|**Descripción**| El Profesor o el Bioquímico registra la disposición final de los residuos químicos generados, indicando el método, la fecha y el responsable.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Profesor, Bioquímico o Administrador. Debe existir un residuo generado y no dispuesto.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Residuos y selecciona el residuo.  |
+|  | 2 | El sistema muestra el residuo y su estado.  |
+|  | 3 | El usuario selecciona "Registrar Disposición Final".  |
+|  | 4 | El sistema solicita el método de disposición, la fecha y el responsable.  |
+|  | 5 | El usuario completa los datos.  |
+|  | 6 | El sistema valida que el residuo no esté ya dispuesto.  |
+|  | 7 | El sistema marca el residuo como "Dispuesto" y registra la fecha, el método y el responsable.  |
+|  | 8 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 9 | La interfaz confirma la disposición.  |
+|**Postcondición**| El residuo queda marcado como "Dispuesto" con su fecha, método y responsable.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 6 | Si el residuo ya está dispuesto, el sistema informa y no permite duplicar.  |
+|  | 5 | Si el método o la fecha están vacíos, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Complementa a UC-LAB-03 (Registrar Generación de Residuos) y UC-LAB-04 (Generar Reporte de Residuos).  |  |
+
+|**UCE–LAB-17**|**Consultar Alertas de Stock y Vencimiento**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-04 Trazabilidad y Control de Stock de Insumos Reactivos  |  |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control  |  |
+|**Descripción**| El usuario consulta el panel de alertas de stock bajo y vencimiento próximo, con los insumos y lotes afectados.  |  |
+|**Precondición**| El usuario debe tener una sesión activa (Administrador, Bioquímico/Doctor o Profesor).  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al panel de control o al módulo de Inventario.  |
+|  | 2 | El sistema consulta los umbrales configurados y los lotes con vencimiento próximo.  |
+|  | 3 | El sistema muestra la lista de alertas: insumos bajo umbral y lotes por vencer.  |
+|  | 4 | El usuario selecciona una alerta para ver el detalle.  |
+|  | 5 | El sistema muestra el insumo, el stock actual, el lote y la fecha de vencimiento.  |
+|**Postcondición**| El sistema presenta las alertas. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay alertas, el sistema muestra "No hay alertas de stock o vencimiento".  |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 2 segundos.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Complementa a UC-LAB-08 (Configurar Umbrales de Alerta), que define los umbrales.  |  |
+
+|**UCE–LAB-21**|**Modificar Registro de Residuos**|  |
+|---|---|---|
+|**Objetivos asociados**| OBJ-05 Sistematización del Registro de Residuos Químicos  |  |
+|**Requisitos asociados**| RF-11 Registro de Generación de Residuos Químicos  |  |
+|**Descripción**| El Administrador corrige un registro de residuo erróneo antes de que se consolide en el reporte mensual.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con rol de Administrador. El registro no debe haber sido incluido en un reporte mensual ya emitido.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa al módulo de Residuos y localiza el registro.  |
+|  | 2 | El sistema muestra el registro en modo edición.  |
+|  | 3 | El usuario modifica el volumen, el peso, la categoría o la descripción.  |
+|  | 4 | El sistema valida que los valores sean mayores a cero.  |
+|  | 5 | El usuario presiona "Guardar Cambios".  |
+|  | 6 | El sistema actualiza el registro y registra la modificación en auditoría.  |
+|  | 7 | La interfaz confirma la actualización.  |
+|**Postcondición**| El registro del residuo queda actualizado.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 1 | Si el registro ya fue incluido en un reporte emitido, el sistema bloquea la modificación.  |
+|  | 4 | Si los valores son inválidos, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Separado de UC-LAB-11 (Consultar Registro de Residuos) para no mezclar consulta y modificación.  |  |
 
 ### 2.8.4 Subsistema Acceso y Seguridad
 |**UCE–SEG-01**|**Iniciar Sesion**|  |
@@ -1619,18 +2348,138 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |  | 1 | El usuario ingresa a la URL del portal interno del laboratorio.  |
 |  | 2 | La interfaz muestra el formulario de inicio de sesión requiriendo Correo Electrónico y Contraseña.  |
 |  | 3 | El usuario completa sus credenciales y presiona "Ingresar".  |
-|  | 4 | El Backend verifica que la cuenta no se encuentre en estado "Bloqueado Temporal" o "Inhabilitado".  |
+|  | 4 | El Backend verifica que la cuenta no se encuentre en estado "Inhabilitado".  |
 |  | 5 | El Backend contrasta la contraseña encriptada (Hash) contra la base de datos.  |
 |  | 6 | El Backend genera un Token de Sesión JWT (JSON Web Token) y lo inyecta en el navegador.  |
 |  | 7 | El sistema registra el evento de inicio de sesión exitoso en la tabla de auditoría  |
 |  | 8 | El sistema redirige al usuario al panel principal con las opciones habilitadas según su rol predefinido.  |
 |**Postcondición**| El sistema valida las credenciales y redirige al panel principal.  |  |
 |**Excepciones**|**Paso**|  |
-|  | 4 | Si la cuenta está bloqueada por intentos fallidos, el sistema rechaza la petición indicando el tiempo de espera restante.  |
-|  | 5 | Si las credenciales son incorrectas, el sistema suma 1 al contador de intentos fallidos. Retorna un error genérico ("Credenciales inválidas"). Si alcanza 5 fallos, cambia el estado a "Bloqueado Temporal" y notifica al usuario en pantalla.  |
+|  | 4 | Si la cuenta está inhabilitada, el sistema rechaza la petición y notifica al usuario.  |
+|  | 5 | Si las credenciales son incorrectas, el sistema suma 1 al contador de intentos fallidos. Retorna un error genérico ("Credenciales inválidas"). Si alcanza 5 fallos, cambia el estado a "Inhabilitado" y notifica al usuario en pantalla.  |
 |**Rendimiento**|**Paso**|  |
 |  | 5 | Menos de 1 segundo |
 |**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–SEG-02**|**Administrar Usuario y Roles**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |  |
+|**Descripción**| El Administrador gestiona el control de acceso a la plataforma: registra usuarios, les asigna uno de los roles prefijados y aplica bajas lógicas al personal que ya no pertenece al laboratorio.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Seguridad.  |
+|  | 2 | El sistema lista los usuarios registrados.  |
+|  | 3 | El usuario selecciona "Nuevo Usuario" o un usuario existente.  |
+|  | 4 | El sistema solicita los datos (nombre, apellido, correo electrónico, contraseña y rol).  |
+|  | 5 | El usuario completa los datos y selecciona uno de los roles prefijados.  |
+|  | 6 | El sistema valida la unicidad del correo y la fortaleza de la contraseña.  |
+|  | 7 | El sistema persiste el usuario y registra el evento en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma la operación.  |
+|**Postcondición**| Los datos de acceso del usuario quedan registrados, modificados o invalidados para futuros inicios de sesión.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 6 | Si el correo ya existe, el sistema rechaza la operación.  |
+|  | 5 | Si el rol no existe, el sistema rechaza la operación.  |
+|  | 7 | Si el Administrador intenta desactivar su propia cuenta, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Los roles son prefijados en el sistema; el Administrador no crea ni redefine roles.  |  |
+
+|**UCE–SEG-03**|**Cerrar Sesión**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |  |
+|**Descripción**| El usuario finaliza de manera explícita su sesión activa en la plataforma para proteger la confidencialidad de la estación de trabajo.  |  |
+|**Precondición**| El usuario debe poseer una sesión activa en el sistema.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario presiona "Cerrar Sesión".  |
+|  | 2 | El sistema invalida el token de sesión.  |
+|  | 3 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 4 | El sistema redirige al usuario a la pantalla de inicio de sesión.  |
+|**Postcondición**| La sesión se invalida y el acceso a las pantallas internas queda cerrado.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si el token de sesión ya expiró, el sistema informa y redirige al inicio de sesión.  |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 1 segundo.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–SEG-04**|**Consultar Registro de Auditoría**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
+|**Requisitos asociados**| RF-14 Registro Automático de Auditoría  |  |
+|**Descripción**| El Administrador consulta el registro de auditoría de las acciones críticas realizadas en la plataforma, con filtros por usuario, fecha y tipo de acción.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con el rol de Administrador.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El Administrador ingresa al módulo de Auditoría.  |
+|  | 2 | El sistema consulta el registro de eventos.  |
+|  | 3 | El Administrador aplica filtros (usuario, fecha, tipo de acción).  |
+|  | 4 | El sistema muestra la lista paginada de eventos.  |
+|  | 5 | El Administrador selecciona un evento para ver el detalle.  |
+|  | 6 | El sistema muestra el evento con usuario, fecha, acción y datos afectados.  |
+|**Postcondición**| El sistema presenta el registro de auditoría. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay eventos, el sistema muestra "No hay eventos registrados".  |
+|  | 4 | Si ningún evento coincide con los filtros, el sistema muestra "No se encontraron eventos".  |
+|**Rendimiento**|**Paso**|  |
+|  | 4 | Menos de 2 segundos.  |
+|**Frecuencia**| Media |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| El registro de auditoría es inmutable. Complementa a UC-SEG-01 (Iniciar Sesión), UC-SEG-02 (Administrar Usuario y Roles) y UC-SEG-03 (Cerrar Sesión).  |  |
+
+|**UCE–SEG-07**|**Recuperar Contraseña**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |  |
+|**Descripción**| El usuario recupera su contraseña mediante un enlace de recuperación enviado a su correo electrónico registrado.  |  |
+|**Precondición**| El usuario debe poseer una cuenta registrada en el sistema.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario presiona "¿Olvidaste tu contraseña?" en la pantalla de inicio de sesión.  |
+|  | 2 | El sistema solicita el correo electrónico registrado.  |
+|  | 3 | El usuario ingresa el correo.  |
+|  | 4 | El sistema verifica que el correo exista.  |
+|  | 5 | El sistema genera un token de recuperación con TTL y envía un enlace por correo.  |
+|  | 6 | El usuario accede al enlace y define una nueva contraseña.  |
+|  | 7 | El sistema valida la fortaleza de la contraseña y actualiza el hash.  |
+|  | 8 | El sistema invalida el token de recuperación.  |
+|  | 9 | El sistema registra el evento en la tabla de auditoría.  |
+|**Postcondición**| La contraseña queda actualizada y el usuario puede iniciar sesión.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si el correo no existe, el sistema muestra un mensaje genérico y no revela si el correo está registrado.  |
+|  | 7 | Si la contraseña no cumple la fortaleza, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 7 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| - |  |
+
+|**UCE–SEG-08**|**Cambiar Contraseña**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Seguridad Operativa)  |  |
+|**Requisitos asociados**| RF-13 Gestión de Cuentas y Autenticación  |  |
+|**Descripción**| El usuario cambia su contraseña desde su sesión activa, ingresando la contraseña actual y la nueva.  |  |
+|**Precondición**| El usuario debe poseer una sesión activa en el sistema.  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario ingresa a su perfil y selecciona "Cambiar Contraseña".  |
+|  | 2 | El sistema solicita la contraseña actual y la nueva.  |
+|  | 3 | El usuario ingresa los datos.  |
+|  | 4 | El sistema valida que la contraseña actual sea correcta.  |
+|  | 5 | El sistema valida la fortaleza de la nueva contraseña.  |
+|  | 6 | El sistema actualiza el hash de la contraseña.  |
+|  | 7 | El sistema registra el evento en la tabla de auditoría.  |
+|  | 8 | La interfaz confirma el cambio.  |
+|**Postcondición**| La contraseña queda actualizada.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 4 | Si la contraseña actual es incorrecta, el sistema rechaza la operación.  |
+|  | 5 | Si la nueva contraseña no cumple la fortaleza, el sistema rechaza la operación.  |
+|**Rendimiento**|**Paso**|  |
+|  | 6 | Menos de 1 segundo.  |
+|**Frecuencia**| Baja |  |
 |**Estabilidad**| Alta |  |
 |**Comentarios**| - |  |
 
@@ -1659,6 +2508,27 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Frecuencia**| Baja |  |
 |**Estabilidad**| Media |  |
 |**Comentarios**| - |  |
+
+|**UCE–REP-02**|**Consultar Panel de Control (Dashboard)**|  |
+|---|---|---|
+|**Objetivos asociados**| Transversal (Generación de Información)  |  |
+|**Requisitos asociados**| RF-09 Alertas de Stock en Panel de Control.<br>RF-15 Consolidación y Exportación de Datos Operativos  |  |
+|**Descripción**| El usuario consulta el panel de control con indicadores de turnos, análisis, inventario y residuos.  |  |
+|**Precondición**| El usuario debe tener una sesión activa con los privilegios necesarios (Bioquímico/Doctor o Administrador).  |  |
+|**Secuencia normal**|**Paso**|  |
+|  | 1 | El usuario inicia sesión y accede al panel de control.  |
+|  | 2 | El sistema consulta los indicadores de turnos, análisis, inventario y residuos.  |
+|  | 3 | El sistema muestra las tarjetas de indicadores y las alertas.  |
+|  | 4 | El usuario selecciona un indicador para ver el detalle.  |
+|  | 5 | El sistema muestra el detalle del indicador.  |
+|**Postcondición**| El sistema presenta el panel de control. Operación de solo lectura.  |  |
+|**Excepciones**|**Paso**|  |
+|  | 2 | Si no hay datos, el sistema muestra "Sin datos disponibles".  |
+|**Rendimiento**|**Paso**|  |
+|  | 2 | Menos de 2 segundos.  |
+|**Frecuencia**| Alta |  |
+|**Estabilidad**| Alta |  |
+|**Comentarios**| Complementa a UC-REP-01 (Consolidar y Exportar Datos Operativos).  |  |
 
 # Glosario de Términos
 |**Término**|**Categoría**|**Comentarios**|
