@@ -85,7 +85,7 @@ classDiagram
     Equipo "N" --> "1" TipoEquipo : "clasificado en"
     Equipo "N" --> "1" UbicacionAlmacenamiento : "ubicado en"
     Equipo "1" --> "0..N" MantenimientoEquipo : "recibe"
-    MantenimientoEquipo "N" --> "1" Usuario : "ejecutado por"
+    %% MantenimientoEquipo no se vincula a Usuario: se terceriza, se registra el prestador como dato.
 
     %% ===== SEGURIDAD / AUDITORIA =====
     Usuario "N" --> "1" Rol : "posee"
@@ -465,7 +465,7 @@ classDiagram
     class MantenimientoEquipo {
         +integer id PK
         +integer equipo_id FK
-        +integer usuario_id FK
+        +string prestador
         +string tipo_mantenimiento
         +datetime fecha
         +text descripcion

@@ -42,3 +42,16 @@ Contemplar ingrso de muestras erróneos
 validar responsabilidades de bioquímico y doctor
 
 justificar json, evaluar tablas
+
+16/09 Pantallas:
+
+Correciones:
+Flujo cancelar:
+* Cambiar palabra "Cancelar", debe ser representativo del borrado logico, no fisico.
+* Al avanzar de etapas incorporar condicion de cargar Observación y Resultados.
+
+Diseñar pantalla y flujo:
+1- Al "cancelar" se debe ingresar el motivo y algun dato mas o validacion o firma.
+
+Flujo Nueva Consulta: 
+* Completar formulario con campos de datos reales. 

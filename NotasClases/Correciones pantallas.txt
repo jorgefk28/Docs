@@ -1,0 +1,15 @@
+G1 🔴 Cancelar "en cualquier momento" — El UC-DIAG-08 (y el BRIEF §6) restringen la cancelación a Pendiente/En Proceso. La pantalla dice "En cualquier momento se puede Cancelar"; si el Detalle deja cancelar un análisis Terminado/Validado, viola el caso de uso.
+G2 🟠 Modal sin motivo obligatorio — El UC exige motivo_cancelacion obligatorio (RF-21) y el BRIEF prohíbe confirmación genérica ("¿Está seguro?"). El modal debe incluir el campo de motivo como requisito.
+G3 🔴 "Regenerar OTP" no está en ningún UC — Es exactamente el punto marcado FALTA DEFINIR en el BRIEF (§5 Informes Emitidos, §6, §9 #7). Para que la pantalla cumpla un caso de uso hay que crear uno nuevo (p. ej. UC-DIAG-12 "Regenerar/Reenviar OTP") o definirlo como extensión de DIAG-05, fijando: ¿invalida el OTP anterior?, ¿reinicia TTL de 7 días?, ¿re-notifica por WhatsApp?, ¿audita la regeneración?
+G4 🟠 "Informes Emitidos" sin UC propio — La pantalla de Resultados lista informes/OTPs internamente, pero no existe un UC de "Consultar Informes Emitidos"; DIAG-09 solo cubre el panel de análisis. Conviene un UC (o declarar la pantalla como apoyo/lectura de DIAG-04 + DIAG-05).
+G5 🟡 Filtros del panel — DIAG-09 exige filtro por estado, tipo de análisis, fecha y bioquímico. La pantalla filtra por estado (contadores), muestra, fecha y bioquímico, pero no menciona filtro por tipo de análisis ni paginación.
+G6 🟡 Alta directa al Detalle — UCE-DIAG-02 (paso 7) redirige al panel; la pantalla abre el Detalle del nuevo análisis. Es una mejora UX razonable, pero es un desvío del flujo documentado.
+G7 🟡 Salto directo a Terminado — DIAG-03 permite avanzar a "En Proceso o Terminado" según selección; el panel lateral sugiere avance secuencial estricto. Definir si se permite Pendiente → Terminado directo.
+G8 🟡 Gesto de validación — El BRIEF exige confirmación reforzada con resumen del informe y prohíbe modal para validar (anti-patrón §8.2). La pantalla no detalla ese gesto.
+
+Corregir:
+
+G1 🔴 Cancelar "en cualquier momento" — El UC-DIAG-08 (y el BRIEF §6) restringen la cancelación a Pendiente/En Proceso. La pantalla dice "En cualquier momento se puede Cancelar"; si el Detalle deja cancelar un análisis Terminado/Validado, viola el caso de uso.
+G2 🟠 Modal sin motivo obligatorio — El UC exige motivo_cancelacion obligatorio (RF-21) y el BRIEF prohíbe confirmación genérica ("¿Está seguro?"). El modal debe incluir el campo de motivo como requisito.
+G4 🟠 "Informes Emitidos" sin UC propio — La pantalla de Resultados lista informes/OTPs internamente, pero no existe un UC de "Consultar Informes Emitidos"; DIAG-09 solo cubre el panel de análisis.
+G5 🟡 Filtros del panel — DIAG-09 exige filtro por estado, tipo de análisis, fecha y bioquímico. La pantalla filtra por estado (contadores), muestra, fecha y bioquímico, pero no menciona filtro por tipo de análisis ni paginación.

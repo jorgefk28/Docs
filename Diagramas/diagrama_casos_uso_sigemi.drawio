@@ -82,19 +82,19 @@
         <mxCell id="DIAG05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-05&#xa;Descargar Informe" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="1140" as="geometry" />
         </mxCell>
-        <mxCell id="DIAG07" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-07&#xa;Consultar Historial de Paciente" vertex="1">
+        <mxCell id="DIAG06" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-06&#xa;Consultar Historial de Paciente" vertex="1">
           <mxGeometry height="52" width="300" x="880" y="1140" as="geometry" />
         </mxCell>
-        <mxCell id="DIAG08" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-08&#xa;Modificar Ficha Clinica" vertex="1">
+        <mxCell id="DIAG07" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-07&#xa;Modificar Ficha Clinica" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="DIAG09" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-09&#xa;Cancelar Analisis" vertex="1">
+        <mxCell id="DIAG08" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-08&#xa;Cancelar Analisis" vertex="1">
           <mxGeometry height="52" width="300" x="880" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="DIAG10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-10&#xa;Consultar Panel de Analisis" vertex="1">
+        <mxCell id="DIAG09" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-09&#xa;Consultar Panel de Analisis" vertex="1">
           <mxGeometry height="52" width="300" x="540" y="1260" as="geometry" />
         </mxCell>
-        <mxCell id="DIAG11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-11&#xa;Gestionar Tipos de Analisis y Muestra" vertex="1">
+        <mxCell id="DIAG10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#b85450;" value="UC-DIAG-10&#xa;Gestionar Tipos de Analisis y Muestra" vertex="1">
           <mxGeometry height="52" width="300" x="880" y="1260" as="geometry" />
         </mxCell>
         <mxCell id="GRP_LAB" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f8f8;strokeColor=#666666;dashed=1;verticalAlign=top;verticalLabelPosition=top;align=center;spacing=1;fontSize=13;" value="" vertex="1">
@@ -277,22 +277,22 @@
             <mxPoint x="260" y="644.9999999999995" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_b17" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG07">
+        <mxCell id="e_b17" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG06">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="644.9999999999995" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_b18" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG08">
+        <mxCell id="e_b18" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG07">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="644.9999999999995" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_b19" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG09">
+        <mxCell id="e_b19" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG08">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="644.9999999999995" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_b20" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG10">
+        <mxCell id="e_b20" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-5" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG09">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="644.9999999999995" as="sourcePoint" />
           </mxGeometry>
@@ -427,17 +427,17 @@
             <mxPoint x="260" y="1545" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_a17" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG07">
+        <mxCell id="e_a17" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG06">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="1545" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_a18" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG09">
+        <mxCell id="e_a18" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG08">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="1545" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_a19" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG11">
+        <mxCell id="e_a19" edge="1" parent="1" source="5phSfRxYK-5CG3QK3BhO-14" style="edgeStyle=straightEdge;html=1;entryX=0;entryY=0.5;endArrow=none;" target="DIAG10">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="260" y="1545" as="sourcePoint" />
           </mxGeometry>
@@ -588,7 +588,7 @@
         <mxCell id="inc_rec19_recs1" edge="1" parent="1" source="REC19" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="inc_diag08_recs1" edge="1" parent="1" source="DIAG08" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
+        <mxCell id="inc_diag07_recs1" edge="1" parent="1" source="DIAG07" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="inc_diag01_recs1" edge="1" parent="1" source="DIAG01" style="html=1;dashed=1;endArrow=open;fontSize=10;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.1;" target="REC_S1" value="&lt;&lt;include&gt;&gt;">
