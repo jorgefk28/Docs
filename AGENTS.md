@@ -14,6 +14,14 @@ Everything else in this repository is **derived, outdated, or auxiliary** and mu
 
 **Levels are not required to correspond 1:1.** A concept defined at level 2 may be realized flattened at level 3 (for example, `Muestra` has no table of its own and lives as columns of `analisis_micologico`). That is translation between levels, not a contradiction — but the mapping **must be documented** in level 3, under "Correspondencia con el modelo de dominio". An undocumented flattening is a contradiction.
 
+## Screen designs (UI/UX)
+
+Screen designs passed for frontend work — Figma files, views or images, or markdown describing screens — carry **presentation authority** (layout, components, copy, visual order). They are not a requirement.
+
+**They never carry maximum authority.** They are derived artifacts: if a design contradicts a business flow or rule from level 1 (requirements), a concept from level 2, or a datum from level 3, **the higher level wins, not the design's UX**.
+
+On conflict, implement the flow per the higher level and report the divergence to the user; never silently "fix" the design, and never propagate the contradiction into levels 1-3.
+
 ## Explicitly not authoritative
 
 Treat all of the following as stale copies, reports, generated summaries, prompts, or scratch material — **not** as requirements:
