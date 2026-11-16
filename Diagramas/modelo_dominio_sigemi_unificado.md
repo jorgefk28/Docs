@@ -23,6 +23,7 @@ flowchart TB
     subgraph PERS["PERSONAS Y ACCESO"]
         Usuario["Usuario"]
         Profesional["Profesional (Bioquímico/Doctor)"]
+        Profesor["Profesor"]
         Administrador["Administrador"]
     end
 
@@ -91,6 +92,7 @@ flowchart TB
 
     %% --- Personas ---
     Usuario -->|"opera como"| Profesional
+    Usuario -->|"opera como"| Profesor
     Usuario -->|"opera como"| Administrador
     Administrador -->|"configura"| ConfigAgenda
     Administrador -->|"define"| Indicacion
@@ -163,7 +165,7 @@ flowchart TB
 ## 2. Lectura del diagrama
 
 - **Núcleo clínico** — el eje del negocio: `Paciente` posee `Ficha Clínica`, la ficha contiene `Dato Clínico` y origina `Análisis Micológico`; la `Muestra` (extraída del paciente) es lo que el análisis estudia, y éste produce `Hallazgo` e `Informe de Resultados`.
-- **Personas y acceso** — `Usuario` es la persona que opera; `Profesional` y `Administrador` son responsabilidades que asume.
+- **Personas y acceso** — `Usuario` es la persona que opera; `Profesional`, `Profesor` y `Administrador` son **roles prefijados** que asume (uno o más a la vez).
 - **Agenda y atención** — la capacidad de atención (`Agenda`, `Configuración`, `Período Inhábil`, `Bloqueo`, `Espacio`, `Grupo`) y la disponibilidad real de quien atiende (`Disponibilidad`, `Ausencia`, `Oferta de Reagendación`).
 - **Catálogos** — los tipos que tipifican el estudio (`Tipo de Análisis`) y la muestra (`Tipo de Muestra`), con la regla que dice qué combinación es válida.
 - **Inventario** — el consumible y su trazabilidad por lote y movimiento.
@@ -207,9 +209,16 @@ Al separar el modelo en diagramas por subsistema se perdieron estas relaciones (
 3. **`Reporte` como padre conceptual.** El negocio lo justifica con nombre propio (Subsistema de Reportes y Estadísticas, §2.7). Hijos: `Reporte de Residuos` (RF-12 / UC–LAB-04), `Reporte de Inventario` (UC–LAB-13) y `Reporte / Estadística` (el módulo que cruza datos clínicos, de inventario y desechos para investigación).
 4. **`Informe de Resultados` NO es un `Reporte`.** Es un documento clínico individual, entregado fehacientemente al paciente con OTP. Distinto por naturaleza del reporte consolidado; forzarlo bajo `Reporte` sería una generalización falsa.
 5. **Se agregó `Reporte de Inventario`.** En el `.mmd` no existía: quedaba escondido dentro del `Reporte` genérico vía `tipo_reporte`. Acá queda explícito como hijo del padre `Reporte`.
-6. **Divergencia deliberada con el diagrama de clases archivado:** el tipo de muestra pasó de `Análisis` a `Muestra`. En el `.mmd` histórico, `AnalisisMicologico` porta `tipo_muestra_id`; acá la muestra es quien porta su tipo (uña, piel, pelo), porque el tipo es inherente a la muestra y el análisis solo la estudia. La persistencia lo aplana: ver la sección "Correspondencia con el modelo de dominio" en `modelo_esquema_bd_sigemi.md` (nivel 3).
+6. **Divergencia deliberada con el diagrama de clases archivado:** el tipo de muestra pasó de `Análisis` a `Muestra`. En el `.mmd` histórico, `AnalisisMicologico` porta `tipo_muestra_id`; acá la muestra es quien porta su tipo (uña, piel, pelo), porque el tipo es inherente a la muestra y el análisis solo la estudia. La persistencia lo materializa como tabla propia (`muestra`): ver la sección "Correspondencia con el modelo de dominio" en `modelo_esquema_bd_sigemi.md` (nivel 3).
 
-## 6. Huecos que quedan abiertos
+## 6. Decisiones cerradas de esta revisión
 
-1. **Cardinalidad `Muestra ↔ Análisis`.** Se asume **1:1** en este sistema (un turno, una muestra, un estudio). Es un supuesto razonable pero conviene confirmarlo contra los requerimientos antes de llevarlo al esquema relacional.
-2. **`Rol`.** El diagrama de clases archivado tiene `Rol` como entidad; el modelo de dominio decidió tratarlo como responsabilidad de `Usuario`. Mantengo la decisión conceptual, pero es una divergencia deliberada respecto del modelo de clases archivado.
+1. **Cardinalidad `Muestra ↔ Análisis` — decidida 1:N.** Una muestra puede alimentar varios análisis (ej. examen directo + cultivo de la misma uña); un análisis se realiza sobre exactamente una muestra. Se lleva así al esquema relacional.
+2. **`Rol`.** El diagrama de clases archivado tiene `Rol` como entidad; el modelo de dominio lo trata como responsabilidad de `Usuario`. Decisión confirmada: los roles son **prefijados y cerrados** (`Profesional`, `Profesor`, `Administrador`) y **acumulables** (un `Usuario` opera con uno o más). El usuario no modela roles propios ni modifica privilegios. Es una divergencia deliberada respecto del modelo de clases archivado.
+3. **`Usuario` — invariantes de la cuenta.** `correo_electronico` es la **identidad** del `Usuario`: se normaliza (sin espacios en los extremos y en minúsculas) antes de comparar y persistir, debe tener **formato de buzón válido** y es **único sin distinguir mayúsculas**. La razón es de negocio, no de estilo: es el dato con el que se inicia sesión (UCE–SEG-01) y el único canal de recuperación de contraseña (UCE–SEG-07), así que dos cuentas no pueden diferir solo en mayúsculas —serían dos altas para la misma persona, con la recuperación apuntando a una sola— ni puede entrar al sistema una dirección que ningún servidor de correo aceptaría. `nombre` y `apellido` son texto libre: no son invariantes de dominio, y ni el formato ni la cota de esos campos se fijan acá.
+4. **`Auditoría` — `accion` es un catálogo cerrado.** Los eventos auditables son un vocabulario controlado y enumerado en el nivel 3 (`crear`, `modificar`, `eliminar`, `consultar`, `acceder`, `bloquear`), no una cadena libre: la auditoría es la traza que el negocio usa para responder quién hizo qué (RF-14), y un valor inventado por cada subsistema la vuelve imposible de filtrar. El **bloqueo de una cuenta por intentos fallidos** es un evento propio (`bloquear`) y no un `acceder`, porque el registro es append-only y una fila etiquetada como ingreso cuando en realidad fue un bloqueo queda mal para siempre. La **baja lógica** de una cuenta se audita como `modificar`, porque el registro no se borra.
+5. **`Turno` — el profesional y el espacio se asignan después, no al agendar.** El nivel 3 los declaraba obligatorios, pero ninguno de los tres UCE que crean un turno (`UC–REC-01`, `UC–REC-20`, `UC–REC-24`) pide elegir profesional ni espacio: el paciente elige fecha y horario. Un `NOT NULL` que ningún flujo puede satisfacer obliga a inventar un valor, y un turno con un profesional inventado es peor que uno sin asignar. Pasan a nullable; la asignación ocurre cuando el laboratorio arma el día (`disponibilidad_profesional`) o al registrar la atención (`UC–REC-15`).
+6. **`Indicación médica` — `tipo_analisis` es obligatorio.** El nivel 3 lo declaraba nullable; `UC–REC-10` paso 2 lo exige y su excepción rechaza el alta sin él. Nivel 1 gana. Una indicación sin estudio es un texto suelto que no puede convertirse en turno.
+7. **`Paciente` — qué es obligatorio y qué no.** Son obligatorios `numero_registro`, `dni`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `estado`, `fecha_ingreso` y `nivel_registro`: sin ellos el paciente no es identificable ni contactable por el canal que el sistema usa (WhatsApp). Son opcionales `sexo`, `domicilio`, `correo_electronico` y `obra_social`, porque `UC–REC-15` paso 6 prevé un formulario ligero que los complete después de la atención: hacerlos obligatorios en el alta contradice ese paso. `numero_registro` lo genera la aplicación; ningún UCE lo pide al operador.
+8. **`Lista de espera` — la prioridad es derivada, no una columna.** `UC–REC-29` ordena «por prioridad (fecha de solicitud y tipo de análisis)»: el orden se calcula al leer (`fecha_solicitud` ascendente, luego `tipo_analisis`). Persistirlo obliga a recalcularlo en cada alta y en cada cambio de la cola, y un valor derivado que se olvida de recalcular miente sin avisar.
+9. **El motivo de la baja de un paciente va a la auditoría, no al paciente.** `UC–REC-19` paso 6 lo exige y el paso 10 dice explícitamente que el evento se registra en la auditoría «con: usuario, fecha, motivo, paciente». Se guarda como una fila de `cambio_auditoria` (`campo = 'motivo_baja'`), que es append-only: el motivo de una baja no debe poder reescribirse, y una columna mutable en `paciente` permitiría exactamente eso.

@@ -23,6 +23,8 @@ Realizado para: Módulo de Bioquímica y Farmacia UNaM
 | 12 | 10/11/2026 | Completitud de Casos de Uso de Recursos de Laboratorio (UC-LAB-14, 17, 21) y sus UCE.  | Kluka Jorge |
 | 13 | 10/11/2026 | Completitud de Casos de Uso de Acceso y Seguridad (UC-SEG-04, 07, 08) y sus UCE.  | Kluka Jorge |
 | 14 | 10/11/2026 | Completitud de Casos de Uso de Reportes y Estadísticas (UC-REP-02) y su UCE.  | Kluka Jorge |
+| 15 | 10/11/2026 | Decisiones de modelado aplicadas: roles prefijados y cerrados (Bioquímico/Doctor, Profesor, Administrador) con acumulación de roles; cardinalidad Muestra↔Análisis 1:N; reemplazo de «Cancelación» por «Invalidación» en RF-21. | Kluka Jorge |
+| 16 | 12/11/2026 | Cuentas y auditoría: el correo electrónico es la identidad de la cuenta y se valida su formato además de su unicidad (UCE–SEG-02, excepción del paso 6); el bloqueo de una cuenta por intentos fallidos es un evento crítico auditable (RF-14). | Kluka Jorge |
 
 # Índice
 # 1. Presentación General
@@ -100,7 +102,7 @@ Para que estos módulos principales operen de manera cohesionada y presenten una
 # Usuarios
 Su propósito es administrar la identidad y las credenciales de todas las personas que interactúan con la plataforma. Gestiona el registro, la modificación y la baja de cuentas, centralizando el proceso de autenticación en el sistema . Representa el pilar inicial de la seguridad de la aplicación, asegurando que únicamente los individuos debidamente identificados puedan ingresar a la plataforma.
 # Roles y permisos
-Su función es controlar y delimitar el nivel de autorización y los privilegios operativos dentro de la aplicación. Opera definiendo qué pantallas, acciones y datos específicos están disponibles para cada tipo de cuenta. Su implementación es fundamental para garantizar la confidencialidad de la información clínica y prevenir alteraciones no autorizadas, forzando a que cada actor opere estrictamente dentro de sus responsabilidades.
+Su función es controlar y delimitar el nivel de autorización y los privilegios operativos dentro de la aplicación. Opera definiendo qué pantallas, acciones y datos específicos están disponibles para cada tipo de cuenta. Los roles son **prefijados y cerrados** (Bioquímico/Doctor, Profesor y Administrador): el usuario no puede crear roles propios ni modificar los privilegios asignados, y un mismo usuario puede acumular más de un rol. Su implementación es fundamental para garantizar la confidencialidad de la información clínica y prevenir alteraciones no autorizadas, forzando a que cada actor opere estrictamente dentro de sus responsabilidades.
 # Estadísticas y Reportes
 Este módulo se encarga de procesar y consolidar los datos transaccionales generados por el resto del sistema para su visualización y exportación. Extrae y cruza datos clínicos, de inventario y de desechos para automatizar la emisión de reportes periódicos y proveer la base de información estructurada que alimentará investigaciones académicas.
 # Auditoría
@@ -259,7 +261,7 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |---|---|
 |**Objetivos Asociados**| Transversal  |
 |**Descripción**| El sistema debe registrar de manera automática y cronológica cada evento significativo o crítico, almacenando el usuario responsable, la fecha, la hora, la dirección IP y el cambio específico realizado. |
-|**Comentarios**| - |
+|**Comentarios**| Son eventos críticos, entre otros, el inicio de sesión y el bloqueo de una cuenta por intentos fallidos; se registran como eventos distintos, porque el registro es inmutable y una traza que los confunde no se corrige después. |
 
 |**RF-15**|**Consolidación y Exportación de Datos Operativos**|
 |---|---|
@@ -297,10 +299,10 @@ Su objetivo es proveer un mecanismo de trazabilidad profundo e inmutable sobre l
 |**Descripción**| El sistema debe permitir al Bioquímico/Doctor modificar una ficha clínica registrada, manteniendo un historial de versiones. |
 |**Comentarios**| Garantiza la trazabilidad de cambios en el historial clínico del paciente. |
 
-|**RF-21**|**Cancelación de Análisis**|
+|**RF-21**|**Invalidación de Análisis**|
 |---|---|
 |**Objetivos Asociados**| OBJ-02  |
-|**Descripción**| El sistema debe permitir cancelar un análisis en curso (con motivo obligatorio) cuando esté en estado «Pendiente» o «En Proceso». |
+|**Descripción**| El sistema debe permitir invalidar un análisis en curso (con motivo obligatorio) cuando esté en estado «Pendiente» o «En Proceso». |
 |**Comentarios**| Evita que análisis no viables continúen su procesamiento y libera recursos del laboratorio. |
 
 ## 2.6 Requisitos No Funcionales
@@ -662,7 +664,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UC–DIAG-08**|**Invalidar Análisis**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
-|**Requisitos asociados**| RF-21 Cancelación de Análisis |
+|**Requisitos asociados**| RF-21 Invalidación de Análisis |
 |**Descripción**| El Bioquímico/Doctor invalida un análisis micológico en curso, registrando el motivo. |
 |**Actor**| Bioquímico/Doctor, Administrador |
 |**Precondición**| El análisis debe existir y estar en estado «Pendiente» o «En Proceso» (no «Validado»). |
@@ -710,7 +712,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UC–DIAG-14**|**Rechazo de Muestra**|
 |---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis |
-|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Cancelación de Análisis |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Invalidación de Análisis |
 |**Descripción**| El Bioquímico/Doctor rechaza una muestra por motivos de calidad (contaminada, insuficiente, inadecuada), registrando el motivo obligatorio y dejando el análisis inválido. |
 |**Actor**| Bioquímico/Doctor |
 |**Precondición**| El análisis debe estar en estado "Pendiente" o "En Proceso". |
@@ -1810,7 +1812,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UCE–DIAG-08**|**Invalidar Análisis**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
-|**Requisitos asociados**| RF-21 Cancelación de Análisis.<br>RF-06 Actualización de Estados de Análisis Micológico.  |  |
+|**Requisitos asociados**| RF-21 Invalidación de Análisis.<br>RF-06 Actualización de Estados de Análisis Micológico.  |  |
 |**Descripción**| El Bioquímico/Doctor o Administrador invalida un análisis micológico en curso, registrando obligatoriamente el motivo.  |  |
 |**Precondición**| El análisis debe existir y estar en estado "Pendiente" o "En Proceso".<br>El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor o Administrador.  |  |
 |**Secuencia normal**|**Paso**|  |
@@ -1931,7 +1933,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**UCE–DIAG-14**|**Rechazo de Muestra**|  |
 |---|---|---|
 |**Objetivos asociados**| OBJ-02 Digitalización del Historial Clínico y Registro de Análisis  |  |
-|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Cancelación de Análisis  |  |
+|**Requisitos asociados**| RF-06 Actualización de Estados de Análisis Micológico.<br>RF-21 Invalidación de Análisis  |  |
 |**Descripción**| El Bioquímico/Doctor rechaza una muestra por motivos de calidad (contaminada, insuficiente, inadecuada), registrando el motivo obligatorio y dejando el análisis inválido.  |  |
 |**Precondición**| El análisis debe estar en estado "Pendiente" o "En Proceso". El usuario debe tener una sesión activa con el rol de Bioquímico/Doctor.  |  |
 |**Secuencia normal**|**Paso**|  |
@@ -2381,6 +2383,7 @@ Figura 5 - DCU Subsistema Reportes y Estadísticas
 |**Postcondición**| Los datos de acceso del usuario quedan registrados, modificados o invalidados para futuros inicios de sesión.  |  |
 |**Excepciones**|**Paso**|  |
 |  | 6 | Si el correo ya existe, el sistema rechaza la operación.  |
+|  | 6 | Si el correo electrónico no tiene un formato válido (no es una dirección a la que se pueda enviar un enlace de recuperación), el sistema rechaza la operación.  |
 |  | 5 | Si el rol no existe, el sistema rechaza la operación.  |
 |  | 7 | Si el Administrador intenta desactivar su propia cuenta, el sistema rechaza la operación.  |
 |**Rendimiento**|**Paso**|  |

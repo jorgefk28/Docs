@@ -5,7 +5,7 @@
 > **Nivel de abstracción**: 3 — Persistencia / Modelo Relacional.
 > **Propósito**: definir *cómo se guarda* el sistema en PostgreSQL: tablas, columnas, tipos, claves e índices.
 > **Regla de oro**: acá SÍ hay `id`, `FK`, tipos SQL, e índices. Incluye los mecanismos (versionado, auditoría, OTP) que el dominio conceptual excluye.
-> **Decisiones fijadas**: claves primarias **UUID**; ORM **SQLAlchemy**; migraciones **Alembic**; versionado de ficha clínica en **jsonb**; `version_actual` persistido.
+> **Decisiones fijadas**: claves primarias **UUID**; ORM **SQLAlchemy**; migraciones **Alembic**; versionado de ficha clínica y de análisis en **jsonb**; `version_actual` persistido; roles **prefijados y cerrados** (`bioquimico` \| `profesor` \| `administrador`).
 > **Alcance**: sistema completo, por subsistemas.
 
 ## Convenciones
@@ -21,13 +21,13 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 
 | Concepto (nivel 2) | Realización (nivel 3) | Tipo de traducción |
 |---|---|---|
-| `Muestra` | columnas de `analisis_micologico` (`tipo_muestra_id`) | **aplanada** (relación 1:1) |
-| `Reporte` (padre) | `reporte` genérica (`tipo_reporte`) + `reporte_residuos` especializada | **especializada** por tabla |
+| `Muestra` | tabla `muestra` + FK en `analisis_micologico` (`muestra_id`) | **tabla propia** (relación 1:N con `Análisis`) |
+| `Reporte` (padre) | `reporte` genérica (`tipo_reporte`) + `reporte_residuos` y `reporte_inventario` especializadas | **especializada** por tabla |
 | `Dato Clínico` | `dato_clinico` | directa |
 | `Registro de Auditoría` | `auditoria` + `cambio_auditoria` | 1:N |
-| `Usuario` ↔ roles | `usuario` + `rol` (`rol_id`) | **divergencia deliberada**: el dominio trata el rol como responsabilidad, el esquema como entidad |
+| `Usuario` ↔ roles | `usuario` + `rol` (catálogo **cerrado** por `codigo`) + `usuario_rol` (N:N) | **divergencia deliberada**: el dominio trata el rol como responsabilidad, el esquema como entidad con catálogo prefijado |
 
-**`Muestra` aplanada.** El nivel 2 define `Muestra` como concepto propio (extraída del paciente, tipificada por `Tipo de Muestra`), con cardinalidad **asumida 1:1** con `Análisis Micológico`. Por ser 1:1, este nivel la aplana en `analisis_micologico.tipo_muestra_id` en vez de crear una tabla propia. **Si esa cardinalidad deja de ser 1:1** (varias muestras por análisis, o una muestra reutilizada), el aplanamiento se rompe y hay que crear la tabla `muestra`.
+**`Muestra` como tabla propia (1:N).** El nivel 2 define `Muestra` como concepto propio (extraída del paciente, tipificada por `Tipo de Muestra`). Decisión confirmada: una **muestra puede alimentar varios análisis** (ej. examen directo + cultivo de la misma uña), y un análisis se realiza sobre exactamente una muestra. Por eso `Muestra` se materializa en la tabla `muestra`, y `analisis_micologico.muestra_id` apunta a ella. La validación `tipo_analisis × tipo_muestra` se evalúa sobre `analisis_micologico.tipo_analisis_id` × `muestra.tipo_muestra_id`.
 
 ## Tablas
 
@@ -47,6 +47,8 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `nivel_registro` | `varchar` | 'temprano' cuando lo crea el Agente IA, 'completo' al registrar ficha |
 | `estado` | `varchar` | activo / inactivo (baja lógica) |
 | `fecha_ingreso` | `timestamptz` | |
+
+> **Obligatoriedad (decisión 7 del nivel 2).** Son `NOT NULL`: `numero_registro`, `dni`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `estado`, `fecha_ingreso` y `nivel_registro`. Son nullable `sexo`, `domicilio`, `correo_electronico` y `obra_social`, porque UC–REC-15 paso 6 prevé un formulario ligero que los complete después de la atención. `numero_registro` lo genera la aplicación: ningún UCE lo pide al operador, y hacerlo tecleable convierte un identificador institucional único en un campo que se puede duplicar.
 
 ### `ficha_clinica`
 
@@ -91,13 +93,15 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `id` | `uuid PK` | |
 | `paciente_id` | `uuid FK → paciente` | |
 | `indicacion_medica_id` | `uuid FK → indicacion_medica` nullable | |
-| `profesional_id` | `uuid FK → profesional` | |
-| `espacio_id` | `uuid FK → espacio_atencion` | (se referencia aunque la tabla completa sea de segunda pasada) |
+| `tipo_analisis_id` | `uuid FK → tipo_analisis` nullable | estudio que motiva el turno (UC–REC-20 paso 6, UC–REC-24 paso 2); nulo cuando lo agenda el Agente IA y nadie lo preguntó |
+| `serie_id` | `uuid` nullable | agrupa los turnos de una serie (UC–REC-24 postcondición «vinculados entre sí»); sin FK porque el grupo es el valor compartido, no una entidad |
+| `profesional_id` | `uuid FK → profesional` nullable | nulo al crear el turno: ningún UCE–REC elige profesional al agendar (decisión 5 del nivel 2) |
+| `espacio_id` | `uuid FK → espacio_atencion` nullable | (se referencia aunque la tabla completa sea de segunda pasada) nulo al crear el turno, por la misma razón que `profesional_id` |
 | `fecha_hora` | `timestamptz` | |
 | `telefono_contacto` | `varchar` | |
 | `estado` | `varchar` | confirmado / pendiente / cancelado / atendido / no_asistio |
 | `reprogramaciones` | `int` | |
-| `motivo_cancelacion` / `motivo_reprogramacion` | `varchar` | |
+| `motivo_cancelacion` / `motivo_reprogramacion` / `motivo_inasistencia` | `varchar` | `motivo_inasistencia` es opcional (UC–REC-15 secuencia Ausente, paso 3) |
 | `fecha_creacion` / `fecha_atencion` | `timestamptz` | |
 
 ### `indicacion_medica`
@@ -107,9 +111,22 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `id` | `uuid PK` | |
 | `titulo` | `varchar` | |
 | `contenido` | `text` | |
-| `tipo_analisis_id` | `uuid FK → tipo_analisis` nullable | |
+| `tipo_analisis_id` | `uuid FK → tipo_analisis` | obligatorio: UC–REC-10 paso 2 lo exige y su excepción rechaza el alta sin él (decisión 6 del nivel 2) |
 | `estado` | `varchar` | activa / inactiva (eliminación lógica, ver UC-REC-12) |
 | `fecha_creacion` / `fecha_modificacion` | `timestamptz` | |
+
+### `muestra`
+
+| columna | tipo | notas |
+|---|---|---|
+| `id` | `uuid PK` | |
+| `paciente_id` | `uuid FK → paciente` | de quién se extrajo |
+| `tipo_muestra_id` | `uuid FK → tipo_muestra` | uña / piel / pelo |
+| `usuario_id` | `uuid FK → usuario` | quién registró el ingreso (UC–DIAG-02) |
+| `fecha_ingreso` | `timestamptz` | recepción física de la muestra |
+| `observaciones` | `text` | observaciones iniciales |
+
+> Una muestra puede alimentar **varios** análisis (1:N): un examen directo y un cultivo de la misma uña son dos `analisis_micologico` apuntando a la misma `muestra`. UC–DIAG-02 registra la muestra y crea el primer análisis sobre ella; los análisis adicionales reutilizan la misma `muestra`. El rechazo de la muestra se expresa a nivel de análisis (`estado = 'invalidado'`, UC–DIAG-14), no como estado propio de `muestra`.
 
 ### `analisis_micologico`
 
@@ -118,12 +135,13 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `id` | `uuid PK` | |
 | `ficha_clinica_id` | `uuid FK → ficha_clinica` | |
 | `tipo_analisis_id` | `uuid FK → tipo_analisis` | |
-| `tipo_muestra_id` | `uuid FK → tipo_muestra` | |
+| `muestra_id` | `uuid FK → muestra` | la muestra física estudiada (1:N; todo análisis tiene exactamente una) |
 | `profesional_responsable_id` | `uuid FK → profesional` | quién *realiza* |
 | `profesional_validador_id` | `uuid FK → profesional` nullable | quién *valida* (firma) |
-| `estado` | `varchar` | pendiente / en_proceso / terminado / validado / cancelado |
+| `version_actual` | `int` | puntero a la versión vigente (addendum, UC–DIAG-13) |
+| `estado` | `varchar` | pendiente / en_proceso / terminado / validado / invalidado |
 | `fecha_creacion` / `fecha_validacion` | `timestamptz` | |
-| `motivo_cancelacion` | `varchar` | |
+| `motivo_invalidacion` | `varchar` | motivo obligatorio de invalidación o rechazo |
 
 ### `hallazgo_analisis`
 
@@ -135,6 +153,21 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `dato` | `text` | |
 | `estado_alcanzado` | `varchar` | |
 | `fecha` | `timestamptz` | |
+
+### `version_analisis`  _(mecanismo de inmutabilidad del análisis)_
+
+| columna | tipo | notas |
+|---|---|---|
+| `id` | `uuid PK` | |
+| `analisis_id` | `uuid FK → analisis_micologico` | |
+| `numero_version` | `int` | |
+| `datos_previos` | `jsonb` | snapshot previo (análisis + hallazgos + informe vigente) |
+| `datos_nuevos` | `jsonb` | snapshot posterior |
+| `usuario_id` | `uuid FK → usuario` | |
+| `fecha_modificacion` | `timestamptz` | |
+| `motivo` | `varchar` | motivo del addendum / corrección |
+
+> Réplica del versionado de `version_ficha_clinica` (inmutabilidad, RNF-04). El addendum (UC–DIAG-13) crea una **nueva versión del análisis** sin alterar la original; `datos_previos`/`datos_nuevos` capturan en `jsonb` el análisis junto con sus `hallazgo_analisis` y el `informe_resultados` vigente en ese momento, para que la versión sea un snapshot inmutable completo. `hallazgo_analisis` e `informe_resultados` **no** llevan versionado propio: son hechos del análisis y quedan capturados dentro del snapshot de versión.
 
 ### `informe_resultados`
 
@@ -157,13 +190,16 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 | `usado` | `boolean` | |
 | `fecha_uso` | `timestamptz` nullable | |
 
-### `usuario` / `rol` / `profesional`
+### `usuario` / `rol` / `usuario_rol` / `profesional`
 
 | tabla | columnas | notas |
 |---|---|---|
-| `rol` | `id uuid PK`, `nombre`, `descripcion` | |
-| `usuario` | `id uuid PK`, `rol_id FK`, `nombre`, `apellido`, `correo_electronico`, `contrasena_hash`, `estado`, `intentos_fallidos`, `bloqueado_hasta`, `fecha_registro` | `contrasena_hash` → JWT/BCrypt |
-| `profesional` | `id uuid PK`, `usuario_id FK (unique)`, `matricula`, `especialidad`, `estado` | 1:1 con `usuario` |
+| `rol` | `id uuid PK`, `codigo` unique, `nombre`, `descripcion` | **catálogo cerrado**: `bioquimico` \| `profesor` \| `administrador`. El usuario no modela roles propios ni modifica privilegios |
+| `usuario` | `id uuid PK`, `nombre`, `apellido`, `correo_electronico` unique, `contrasena_hash`, `estado`, `intentos_fallidos`, `bloqueado_hasta`, `fecha_registro` | `contrasena_hash` → JWT/BCrypt. Sin `rol_id`: los roles viven en `usuario_rol` |
+| `usuario_rol` | `usuario_id FK → usuario`, `rol_id FK → rol`, `UNIQUE(usuario_id, rol_id)` | N:N; un usuario acumula uno o más roles (ej. `administrador` + `bioquimico`) |
+| `profesional` | `id uuid PK`, `usuario_id FK (unique)`, `matricula`, `especialidad`, `estado` | 1:1 con `usuario`; aplica **solo** al rol `bioquimico` |
+
+> Regla `usuario`: `correo_electronico` es la **identidad de la cuenta**. Es el dato con el que se inicia sesión (UCE–SEG-01) y el único canal de recuperación de contraseña (UCE–SEG-07), y de ahí salen sus tres invariantes: se persiste **normalizado** (sin espacios en los extremos y en minúsculas), su **formato de buzón** lo valida la aplicación rechazando con el mensaje de error de campo del contrato de respuesta (UCE–SEG-02, excepción del paso 6), y la `UNIQUE` es **insensible a mayúsculas** como consecuencia de la normalización, no por una colación especial. `nombre` y `apellido` son texto libre: este nivel no les fija cota, y la cota de presentación pertenece a la especificación de la pantalla.
 
 ## Catálogos de Análisis
 
@@ -197,6 +233,22 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 > Regla de negocio: solo se puede registrar un análisis o agendar un turno si la combinación `tipo_analisis × tipo_muestra` está admitida en esta tabla.
 
 ## Agenda y Atención
+
+### `lista_espera`
+
+| columna | tipo | notas |
+|---|---|---|
+| `id` | `uuid PK` | |
+| `paciente_id` | `uuid FK → paciente` | |
+| `tipo_analisis_id` | `uuid FK → tipo_analisis` nullable | estudio solicitado; participa del orden de prioridad |
+| `fecha_solicitud` | `timestamptz` | base del orden de prioridad |
+| `estado` | `varchar` | pendiente / asignado / retirado |
+| `usuario_id` | `uuid FK → usuario` nullable | quién la cargó; nulo cuando la creó el Agente IA |
+| `observaciones` | `text` | |
+
+> Regla: `prioridad` **no se persiste**. El orden que UC–REC-29 pide («por prioridad (fecha de solicitud y tipo de análisis)») es derivado: `fecha_solicitud` ascendente y, a igualdad, el `tipo_analisis` (decisión 4 del nivel 2). Guardar un valor derivado obliga a recalcularlo en cada alta y lo deja mintiendo en cuanto la cola se reordena.
+>
+> Regla: la lista de espera existe porque UC–REC-23, 28 y 29 operan sobre ella y UC–REC-04 necesita a quién ofrecer un turno liberado. Sin esta tabla, RF-03 no tiene de dónde elegir.
 
 ### `espacio_atencion`
 
@@ -317,6 +369,7 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 ## Índices sugeridos
 
 - `paciente(dni)`, `paciente(apellido, nombre)` — búsqueda (UC-REC-S-01).
+- `lista_espera(estado)`, `lista_espera(fecha_solicitud)` — cola de UC–REC-29.
 - `turno(fecha_hora)`, `turno(paciente_id)`, `turno(profesional_id)`, `turno(espacio_id)` — agenda y filtros.
 - `analisis_micologico(estado)` — panel de trabajo por estado.
 - `otp(analisis_id)` — búsqueda del OTP vigente.
@@ -330,6 +383,10 @@ Este nivel **traduce** el modelo conceptual; no tiene por qué corresponderle 1:
 - `insumo(categoria_id)`, `insumo(umbral_minimo)` — filtros y alertas de stock (RF-09).
 - `residuo_quimico(fecha_hora)`, `residuo_quimico(categoria_residuo_id)` — consolidación mensual (RF-12).
 - `instruccion_almacenamiento(categoria_residuo_id)` — pasos por categoría.
+- `muestra(paciente_id)`, `muestra(tipo_muestra_id)` — muestras por paciente y por tipo.
+- `analisis_micologico(muestra_id)` — análisis de una muestra.
+- `version_analisis(analisis_id)` — historial de versiones del análisis.
+- `usuario_rol(usuario_id)`, `usuario_rol(rol_id)` — resolución de roles por usuario y por rol.
 
 ## Decisiones de modelado de la pasada Agenda (resueltas con el cliente)
 
@@ -473,6 +530,19 @@ Los tres baches se resolvieron así (el `.mmd` NO se toca hasta validar en bloqu
 
 > **Nota de modelado**: `.mmd` dibuja `ResiduoQuimico "N" --> "1" ReporteResiduos : "consolidado en"`, pero `residuo_quimico` **no tiene** `reporte_residuos_id` en sus atributos. El reporte mensual consolida por **rango de fechas** (RF-12), no por FK directa al residuo. Se resuelve como consulta por rango. `mes_anio` es derivable de `rango_fecha_inicio`; se deja por ahora, marcado como candidato a eliminar.
 
+### `reporte_inventario`
+
+| columna | tipo | notas |
+|---|---|---|
+| `id` | `uuid PK` | |
+| `usuario_id` | `uuid FK → usuario` | quién lo generó |
+| `rango_fecha_inicio` | `date` | |
+| `rango_fecha_fin` | `date` | |
+| `ruta_archivo` | `varchar` | archivo generado |
+| `fecha_generacion` | `timestamptz` | |
+
+> Tabla especializada para el **reporte de inventario** (UC–LAB-13), simétrica a `reporte_residuos`. Consolida movimientos y stock por rango de fechas; no se fusiona con `reporte` (que sigue siendo la genérica para las exportaciones transversales, REP-01).
+
 ### `tipo_equipo`
 
 | columna | tipo | notas |
@@ -529,11 +599,14 @@ Los tres baches se resolvieron así (el `.mmd` NO se toca hasta validar en bloqu
 | `fecha_hora` | `timestamptz` | |
 | `direccion_ip` | `varchar` | |
 | `modulo` | `varchar` | subsistema que originó el evento |
-| `accion` | `varchar` | ej. crear / modificar / eliminar / consultar |
+| `accion` | `varchar` | **catálogo cerrado**: `crear` \| `modificar` \| `eliminar` \| `consultar` \| `acceder` \| `bloquear` |
 | `entidad_afectada` | `varchar` | tabla/clase afectada |
 | `entidad_id` | `uuid` | id del registro afectado (sin FK, por ser polimórfico) |
 
 > Regla: la auditoría es un registro **append-only** (nunca se edita ni se borra). `entidad_id` no lleva FK porque apunta a distintas tablas según `entidad_afectada` (relación polimórfica); la integridad referencial la garantiza la aplicación. Índice `(entidad_afectada, entidad_id)` y `(fecha_hora)` para consultas de trazabilidad.
+
+> Regla `accion`: **no es texto libre**. Es el catálogo cerrado de arriba y la aplicación lo verifica al escribir, porque un registro inmutable con un valor inventado no se corrige después. `acceder` es un inicio de sesión exitoso y `bloquear` el bloqueo de una cuenta por intentos fallidos: son eventos distintos y no se etiquetan igual, o la traza afirmaría que alguien entró cuando en realidad se lo bloqueó. La **baja lógica** de una cuenta se audita como `modificar`, porque el registro no se borra; `eliminar` queda reservado a un borrado físico, que hoy ningún flujo ejerce. `consultar` cubre lecturas y exportaciones.
+
 
 ### `cambio_auditoria`
 
@@ -561,7 +634,7 @@ Los tres baches se resolvieron así (el `.mmd` NO se toca hasta validar en bloqu
 | `fecha_generacion` | `timestamptz` | |
 | `mes_anio` | `varchar` | 'YYYY-MM' |
 
-> **Nota de modelado**: `.mmd` tiene dos entidades de reporte distintas: `Reporte` (genérica, con `tipo_reporte` y `formato_archivo`) y `ReporteResiduos` (mensual de residuos, ya modelada como `reporte_residuos`). `reporte` es la tabla **genérica** de reportes; `reporte_residuos` sigue siendo la especializada del subsistema de residuos. No se fusionan: cubren dominios distintos.
+> **Nota de modelado**: el nivel 2 define `Reporte` como padre con hijos regionales. La realización es mixta: `reporte` es la tabla **genérica** (exportaciones transversales, REP-01), mientras que `reporte_residuos` y `reporte_inventario` son las tablas especializadas de sus subsistemas (RF-12 y UC–LAB-13). No se fusionan: cubren dominios distintos.
 
 ### Índices (Transversales)
 
@@ -569,10 +642,10 @@ Los tres baches se resolvieron así (el `.mmd` NO se toca hasta validar en bloqu
 - `cambio_auditoria(auditoria_id)`.
 - `reporte(usuario_id)`, `reporte(fecha_generacion)`.
 
-## Huecos abiertos (nivel 3)
+## Decisiones cerradas (nivel 3)
 
-1. **`Reporte de Inventario` sin realización.** El nivel 2 lo define como hijo de `Reporte` (caso de uso `UC–LAB-13`, requerimiento de reporte de inventario) y el `.mmd` histórico lo escondía dentro de la tabla genérica vía `tipo_reporte`. Este nivel **no lo materializa**. Hay que decidir una de dos y documentarla:
-   - **(a)** fila de `reporte` con `tipo_reporte = 'inventario'` (más simple, sin tabla nueva), o
-   - **(b)** tabla especializada `reporte_inventario`, como se hizo con `reporte_residuos` (más explícita, coherente con el patrón ya elegido para residuos).
-2. **Columnas de ingreso de muestra.** El aplanamiento de `Muestra` pierde hoy la información del caso de uso `UC–DIAG-02 Registrar Ingreso de Muestra`. Para cubrirlo, `analisis_micologico` debería sumar `fecha_ingreso_muestra timestamptz` y `observaciones_muestra text`. Pendiente de aplicar.
-3. **Cardinalidad `Muestra ↔ Análisis`.** El aplanamiento del punto anterior depende de que sea 1:1. Es un supuesto heredado del nivel 2, todavía sin confirmar contra el nivel 1.
+Los huecos detectados en la revisión quedan resueltos así:
+
+1. **`Reporte de Inventario` (UC–LAB-13)** → tabla especializada `reporte_inventario`, simétrica a `reporte_residuos` (opción coherente con el patrón ya elegido).
+2. **Ingreso de muestra (UC–DIAG-02)** → materializado con la tabla `muestra` (`fecha_ingreso`, `observaciones`).
+3. **Cardinalidad `Muestra ↔ Análisis`** → **1:N**: una muestra puede alimentar varios análisis; `Muestra` deja de aplanarse y pasa a tabla propia.
