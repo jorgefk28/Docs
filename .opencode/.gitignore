@@ -1,3 +1,0 @@
-/node_modules/**/*
-/commands/context_*
-**/.env

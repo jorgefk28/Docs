@@ -1,0 +1,14 @@
+# Ignore everything by default.
+*
+
+# Keep this .gitignore itself.
+!.gitignore
+
+# Keep the requirements document (level 1 source of truth).
+!TF_2026_Requerimientos_KLUKA_JORGE.md
+
+# Keep the diagrams folder (level 2 and level 3 sources of truth).
+# The directory has to be re-included first, otherwise git never descends
+# into it and its contents stay excluded.
+!Diagramas/
+!Diagramas/**
